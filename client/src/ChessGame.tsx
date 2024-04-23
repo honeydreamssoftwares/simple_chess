@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import  { useState,useEffect } from 'react';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import * as Colyseus from "colyseus.js";
@@ -9,7 +9,7 @@ import { Chessboard } from 'react-chessboard';
 import {ToastContainer ,toast} from 'react-toastify';
 
 
-function App() {
+function ChessGame() {
   const [client] = useState(new Colyseus.Client('ws://localhost:2567'));
   const [room, setRoom] = useState<Room<unknown> | null>(null);
   const [error, setError] = useState('');
@@ -140,4 +140,4 @@ function App() {
   
 }
 
-export default App;
+export default ChessGame;

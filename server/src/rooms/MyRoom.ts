@@ -11,13 +11,22 @@ import ErrorMessage from "./schema/ErrorMessage";
 export class MyRoom extends Room<MyRoomState> {
   private chessGame: Chess;
   maxClients = 2;
+  private moveTimeout: NodeJS.Timeout | null = null;
+
 
   onCreate (options: any) {
     this.setState(new MyRoomState());
     this.chessGame = new Chess();
 
+
     this.onMessage("player_move", (client: Client, data: { from: string; to: string }) => {
       try {
+
+        if (this.moveTimeout) {
+          clearTimeout(this.moveTimeout);  // Clear the existing timeout when a new move is made
+        }
+
+
           const move = this.chessGame.move({ from: data.from, to: data.to });
 
           if (move === null) {
@@ -43,6 +52,12 @@ export class MyRoom extends Room<MyRoomState> {
             fen: this.chessGame.fen(),
             turn: this.chessGame.turn() === 'w' ? 'white' : 'black'
           });
+
+          // Set a timeout to enforce move timer
+        this.moveTimeout = setTimeout(() => {
+          // Code to handle timeout scenario, e.g., force a move, end the game, etc.
+          this.broadcast("move_timeout", "Player did not make a move in time.");
+        }, 10000); // 10 seconds timeout
         
         } catch (error) {
           console.error("Error processing move:", error);
