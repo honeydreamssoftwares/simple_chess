@@ -122,55 +122,94 @@ function ChessGame() {
 
     return true; 
   };
+
+  const isPlayerAlone=()=>{
+    return (playerCount < 2 ? true:false)
+  }
+
+  const errorBlock=()=>{
+    return <p className="error" >{error}</p>
+  }
+
+  const whosTurnBlock=()=>{
+    return (
+      <p>
+        {turn === playerColor
+          ? "It's your turn!"
+          : "Waiting for opponent's move..."}
+      </p>
+    )}
+  
+
+    const versesBlock=()=>{
+      return <div>Game : {playerName} vs {opponentName}</div>
+    }
+
+
+    const mainGameAreaBlock=()=>{
+      return     (        <>
+      {whosTurnBlock()}
+      {versesBlock()}
+      <p>{gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}</p>
+      {!gameOver && (
+        <Chessboard
+          boardOrientation={isWhite ? "white" : "black"}
+          position={game.fen()}
+          onPieceDrop={onPieceDrop}
+        />
+      )}
+    </>)
+    }
+
+
+
+
+  const roomBlock=()=>{
+
+    if(!room){
+      return;
+    }
+
+    return (
+      <div className="game-container">
+        <div className="chessboard-container">
+          <div>Room ID: {room.id}</div>
+          {isPlayerAlone() ? (
+            <p>Waiting for an opponent...</p>
+          ) : (
+            <>
+              {mainGameAreaBlock()}
+            </>
+          )}
+        </div>
+        <div className="move-history-container">
+          <MoveHistory moves={moves} />
+        </div>
+      </div>
+    )
+  }
+
+
+  const playerEntryBlock=()=>{
+
+    return         <>
+    <input
+      value={playerName}
+      onChange={(e) => setPlayerName(e.target.value)}
+      placeholder="Enter your name"
+    />
+    <button onClick={connectToRoom}>Play now</button>
+  </>
+  }
+
   return (
     <>
       <h1>Simple Multiplayer Chess</h1>
       <p className="read-the-docs">Simple way to play chess online</p>
 
-      {error && <p className="error">{error}</p>}
+      {errorBlock()}
 
-      {room ? (
-        <div className="game-container">
-          <div className="chessboard-container">
-            <div>Room ID: {room.id}</div>
-            {playerCount < 2 ? (
-              <p>Waiting for an opponent...</p>
-            ) : (
-              <>
-               {playerColor && (
-                <p>
-                  {turn === playerColor
-                    ? "It's your turn!"
-                    : "Waiting for opponent's move..."}
-                </p>
-              )}
-              <div>Game : {playerName} vs {opponentName}</div>
-                <p>{playerName} vs {opponentName}</p>
-                <p>{gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}</p>
-                {!gameOver && (
-                  <Chessboard
-                    boardOrientation={isWhite ? "white" : "black"}
-                    position={game.fen()}
-                    onPieceDrop={onPieceDrop}
-                  />
-                )}
-              </>
-            )}
-          </div>
-          <div className="move-history-container">
-            <MoveHistory moves={moves} />
-          </div>
-        </div>
-      ) : (
-        <>
-          <input
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            placeholder="Enter your name"
-          />
-          <button onClick={connectToRoom}>Play now</button>
-        </>
-      )}
+      {room ? roomBlock(): (playerEntryBlock())}
       <ToastContainer
         position="top-right"
         autoClose={5000}
