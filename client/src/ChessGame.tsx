@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import * as Colyseus from "colyseus.js";
 import { Room } from "colyseus.js";
@@ -126,31 +125,27 @@ function ChessGame() {
   const isPlayerAlone=()=>{
     return (playerCount < 2 ? true:false)
   }
+  const errorBlock = () => (
+    error && <p className="text-red-500 text-center">{error}</p>
+  );
 
-  const errorBlock=()=>{
-    return <p className="error" >{error}</p>
-  }
+  const whosTurnBlock = () => (
+    <p className={`text-lg font-semibold ${turn === playerColor ? 'text-green-500' : 'text-red-500'}`}>
+      {turn === playerColor ? "It's your turn!" : "Waiting for opponent's move..."}
+    </p>
+  );
 
-  const whosTurnBlock=()=>{
-    return (
-      <p>
-        {turn === playerColor
-          ? "It's your turn!"
-          : "Waiting for opponent's move..."}
-      </p>
-    )}
-  
+  const versesBlock = () => (
+    <div className="text-lg font-bold text-blue-800 mb-4">
+      Game: {playerName} vs {opponentName}
+    </div>
+  );
 
-    const versesBlock=()=>{
-      return <div>Game : {playerName} vs {opponentName}</div>
-    }
-
-
-    const mainGameAreaBlock=()=>{
-      return     (        <>
+  const mainGameAreaBlock = () => (
+    <>
       {whosTurnBlock()}
       {versesBlock()}
-      <p>{gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}</p>
+      <p className="mb-4">{gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}</p>
       {!gameOver && (
         <Chessboard
           boardOrientation={isWhite ? "white" : "black"}
@@ -158,58 +153,45 @@ function ChessGame() {
           onPieceDrop={onPieceDrop}
         />
       )}
-    </>)
-    }
+    </>
+  );
 
-
-
-
-  const roomBlock=()=>{
-
-    if(!room){
-      return;
-    }
-
-    return (
-      <div className="game-container">
-        <div className="chessboard-container">
-          <div>Room ID: {room.id}</div>
-          {isPlayerAlone() ? (
-            <p>Waiting for an opponent...</p>
-          ) : (
-            <>
-              {mainGameAreaBlock()}
-            </>
-          )}
-        </div>
-        <div className="move-history-container">
-          <MoveHistory moves={moves} />
-        </div>
+  const roomBlock = () => (
+    <div className="flex flex-row justify-center items-start space-x-8">
+      <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg">
+        <div>Room ID: {room?.id}</div>
+        {isPlayerAlone() ? <p>Waiting for an opponent...</p> : mainGameAreaBlock()}
       </div>
-    )
-  }
+      <div className="w-64">
+        <MoveHistory moves={moves} />
+      </div>
+    </div>
+  );
 
-
-  const playerEntryBlock=()=>{
-
-    return         <>
-    <input
-      value={playerName}
-      onChange={(e) => setPlayerName(e.target.value)}
-      placeholder="Enter your name"
-    />
-    <button onClick={connectToRoom}>Play now</button>
-  </>
-  }
+  const playerEntryBlock = () => (
+    <div className="space-y-4">
+      <input
+        className="border border-gray-300 p-2 w-full rounded"
+        value={playerName}
+        onChange={(e) => setPlayerName(e.target.value)}
+        placeholder="Enter your name"
+      />
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={connectToRoom}
+      >
+        Play now
+      </button>
+    </div>
+  );
 
   return (
-    <>
-      <h1>Simple Multiplayer Chess</h1>
-      <p className="read-the-docs">Simple way to play chess online</p>
-
-      {errorBlock()}
-
-      {room ? roomBlock(): (playerEntryBlock())}
+    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center items-center">
+      <h1 className="text-3xl font-bold text-center mb-4">Simple Multiplayer Chess</h1>
+      <div className="w-full max-w-md">
+        {errorBlock()}
+        {room ? roomBlock() : playerEntryBlock()}
+      </div>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -221,7 +203,7 @@ function ChessGame() {
         draggable
         pauseOnHover
       />
-    </>
+    </div>
   );
 }
 
