@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import * as Colyseus from "colyseus.js";
-//import MoveEngine from './components/MoveEngine';
 import { Room } from "colyseus.js";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
@@ -131,13 +130,14 @@ function ChessGame() {
       {error && <p className="error">{error}</p>}
 
       {room ? (
-        <>
-          <div>Room ID: {room.id}</div>
-          {playerCount < 2 ? (
-            <p>Waiting for an opponent...</p>
-          ) : (
-            <>
-              {playerColor && (
+        <div className="game-container">
+          <div className="chessboard-container">
+            <div>Room ID: {room.id}</div>
+            {playerCount < 2 ? (
+              <p>Waiting for an opponent...</p>
+            ) : (
+              <>
+               {playerColor && (
                 <p>
                   {turn === playerColor
                     ? "It's your turn!"
@@ -145,25 +145,30 @@ function ChessGame() {
                 </p>
               )}
               <div>Game : {playerName} vs {opponentName}</div>
-              <p>{gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}</p>
-              {!gameOver && (
-              <Chessboard
-                boardOrientation={isWhite ? "white" : "black"}
-                position={game.fen()}
-                onPieceDrop={onPieceDrop}
-              />)}
-              <MoveHistory moves={moves} />
-            </>
-          )}
-        </>
+                <p>{playerName} vs {opponentName}</p>
+                <p>{gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}</p>
+                {!gameOver && (
+                  <Chessboard
+                    boardOrientation={isWhite ? "white" : "black"}
+                    position={game.fen()}
+                    onPieceDrop={onPieceDrop}
+                  />
+                )}
+              </>
+            )}
+          </div>
+          <div className="move-history-container">
+            <MoveHistory moves={moves} />
+          </div>
+        </div>
       ) : (
         <>
-        <input
+          <input
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
             placeholder="Enter your name"
           />
-        <button onClick={connectToRoom}>Play now</button>
+          <button onClick={connectToRoom}>Play now</button>
         </>
       )}
       <ToastContainer
