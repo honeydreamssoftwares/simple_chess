@@ -54,12 +54,11 @@ function ChessGame() {
     room.onMessage("game_start", message => {
       console.log(message);
       toast.info("Game Started..");
-      // Handle game start
   });
 
   room.onMessage("waiting_for_player", message => {
       console.log(message);
-      // Display a message or indicator that the game is waiting for another player
+      toast.info("Waiting for player..");
   });
 
   room.onMessage("color_assignment", (message) => {
