@@ -15,6 +15,7 @@ function App() {
   const [error, setError] = useState('');
   const [game,setGame] = useState(new Chess());
   const [playerCount, setPlayerCount] = useState(0);
+  const [isWhite, setIsWhite] = useState(true); // True if this client plays as White
 
   useEffect(() => {
     if (room) {
@@ -55,6 +56,10 @@ function App() {
   room.onMessage("waiting_for_player", message => {
       console.log(message);
       // Display a message or indicator that the game is waiting for another player
+  });
+
+  room.onMessage("color_assignment", (message) => {
+    setIsWhite(message.color === "white");
   });
   
     }
@@ -109,7 +114,7 @@ function App() {
           {playerCount < 2 ? (
             <p>Waiting for an opponent...</p>
           ) : (
-            <Chessboard position={game.fen()} onPieceDrop={customOnPieceDrop} />
+            <Chessboard boardOrientation={isWhite ? 'white' : 'black'} position={game.fen()} onPieceDrop={customOnPieceDrop} />
           )}
         </>
       ) : (

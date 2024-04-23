@@ -52,6 +52,12 @@ export class MyRoom extends Room<MyRoomState> {
 }
   onJoin (client: Client, options: any) {
     console.log(client.sessionId, "joined!");
+    if (this.clients.length === 1) {
+      client.send("color_assignment", { color: "white" });
+    } else {
+      client.send("color_assignment", { color: "black" });
+    }
+  
     this.broadcast("player_joined", { sessionId: client.sessionId, numberOfPlayers: this.clients.length });
   }
   
