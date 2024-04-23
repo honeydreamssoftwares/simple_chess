@@ -16,6 +16,8 @@ function App() {
   const [game,setGame] = useState(new Chess());
   const [playerCount, setPlayerCount] = useState(0);
   const [isWhite, setIsWhite] = useState(true); // True if this client plays as White
+  const [turn, setTurn] = useState('white');
+  const [playerColor, setPlayerColor] = useState('');
 
   useEffect(() => {
     if (room) {
@@ -34,6 +36,8 @@ function App() {
     room.onMessage("update_state", (message) => {
       console.log("updating_ game",message);
       setGame(new Chess(message.fen));
+      setTurn(message.turn);
+
     });
 
 
@@ -60,6 +64,9 @@ function App() {
 
   room.onMessage("color_assignment", (message) => {
     setIsWhite(message.color === "white");
+    
+    setPlayerColor(message.color);
+    console.log("player_colour",message.color);
   });
   
     }
@@ -114,7 +121,14 @@ function App() {
           {playerCount < 2 ? (
             <p>Waiting for an opponent...</p>
           ) : (
-            <Chessboard boardOrientation={isWhite ? 'white' : 'black'} position={game.fen()} onPieceDrop={customOnPieceDrop} />
+            <>
+            {playerColor && (
+              <p>{turn === playerColor ? "It's your turn!" : "Waiting for opponent's move..."}</p>
+            )}
+            <Chessboard 
+            boardOrientation={isWhite ? 'white' : 'black'} position={game.fen()} onPieceDrop={customOnPieceDrop} />
+
+            </>
           )}
         </>
       ) : (

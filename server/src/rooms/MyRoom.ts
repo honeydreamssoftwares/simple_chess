@@ -39,8 +39,12 @@ export class MyRoom extends Room<MyRoomState> {
           this.state.moves.push(playerMove); // Assuming 'moves' is an array to track history
 
           // Broadcast updated FEN to all clients
-          this.broadcast("update_state", { fen: this.state.fen });
-      } catch (error) {
+          this.broadcast("update_state", {
+            fen: this.chessGame.fen(),
+            turn: this.chessGame.turn() === 'w' ? 'white' : 'black'
+          });
+        
+        } catch (error) {
           console.error("Error processing move:", error);
 
           const errorMessage =new ErrorMessage(); 
