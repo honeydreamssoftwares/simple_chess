@@ -14,6 +14,7 @@ function App() {
   const [room, setRoom] = useState<Room<unknown> | null>(null);
   const [error, setError] = useState('');
   const [game,setGame] = useState(new Chess());
+  const [playerCount, setPlayerCount] = useState(0);
 
   useEffect(() => {
     if (room) {
@@ -27,8 +28,42 @@ function App() {
         //
         console.log("sent", type, message);
     });
+
+
+    room.onMessage("update_state", (message) => {
+      console.log("updating_ game",message);
+      setGame(new Chess(message.fen));
+    });
+
+
+
+    room.onMessage("player_joined", (message) => {
+      setPlayerCount(message.numberOfPlayers); // Update player count when new player joins
+    });
+
+    room.onMessage("player_left", (message) => {
+      setPlayerCount(message.numberOfPlayers); // Update player count when a player leaves
+    });
+
+
+    room.onMessage("game_start", message => {
+      console.log(message);
+      // Handle game start
+  });
+
+  room.onMessage("waiting_for_player", message => {
+      console.log(message);
+      // Display a message or indicator that the game is waiting for another player
+  });
+  
     }
+
+
+    
+
   }, [room]);
+
+  
 
   const connectToRoom = async () => {
     try {
@@ -83,28 +118,31 @@ function App() {
 
     return true;  // You need to manage game state or any other operations needed
   };
-
   return (
     <>
       <h1>Simple Multiplayer Chess</h1>
       <p className="read-the-docs">
         Simple way to play chess online
       </p>
-
+  
       {error && <p className="error">{error}</p>}
-
+  
       {room ? (
-        <>Room ID {room.id}
-        <Chessboard  position={game.fen()} onPieceDrop={customOnPieceDrop}  /> 
-
+        <>
+          <div>Room ID: {room.id}</div>
+          {playerCount < 2 ? (
+            <p>Waiting for an opponent...</p>
+          ) : (
+            <Chessboard position={game.fen()} onPieceDrop={customOnPieceDrop} />
+          )}
         </>
       ) : (
         <button onClick={connectToRoom}>Play now</button>
       )}
-            <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
-
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
     </>
   );
+  
 }
 
 export default App;
