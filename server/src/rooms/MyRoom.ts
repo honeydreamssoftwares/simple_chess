@@ -1,9 +1,7 @@
-import { Schema } from '@colyseus/schema';
 import { Room, Client } from "@colyseus/core";
 import { MyRoomState } from "./schema/MyRoomState";
 import PlayerMove from "./schema/PlayerMove";
 import { Chess } from "chess.js"; 
-import { type, ArraySchema } from "@colyseus/schema";
 import { PlayerDetails } from './schema/PlayerDetails';
 
 
@@ -46,6 +44,10 @@ export class MyRoom extends Room<MyRoomState> {
               client.send("error",{message:"Illegal move!!!"});
               return; 
           }
+            //Valid move
+
+            this.checkGameStatus(client);
+
 
           // Move is legal, update the FEN in the room state
           this.state.fen = this.chessGame.fen();
@@ -65,6 +67,12 @@ export class MyRoom extends Room<MyRoomState> {
           // Set a timeout to enforce move timer
         this.moveTimeout = setTimeout(() => {
           // Code to handle timeout scenario, e.g., force a move, end the game, etc.
+          const gameResult = { winner: "", status: "", fen: this.chessGame.fen() };
+          gameResult.status = "Draw";
+          gameResult.winner = this.chessGame.turn() === 'w' ? 'Black' : 'White';
+          this.broadcast("game_over", gameResult);
+
+
           this.broadcast("move_timeout", "Player did not make a move in time.");
         }, 10000); // 10 seconds timeout
         
@@ -73,6 +81,26 @@ export class MyRoom extends Room<MyRoomState> {
           client.send("error",{message:"Failed to process the move!"});
         }
   });
+}
+
+checkGameStatus(client: Client) {
+  const gameResult = { winner: "", status: "", fen: this.chessGame.fen() };
+
+  if (this.chessGame.isCheckmate()) {
+    gameResult.winner = this.chessGame.turn() === 'w' ? 'Black' : 'White';
+    gameResult.status = "Checkmate";
+  } else if (this.chessGame.isDraw() || this.chessGame.isStalemate() || this.chessGame.isThreefoldRepetition() || this.chessGame.isInsufficientMaterial()) {
+    gameResult.status = "Draw";
+  }
+
+  if (gameResult.status) {
+    this.broadcast("game_over", gameResult);
+    this.state.fen = this.chessGame.fen();  // Update the state with the final position
+    this.broadcast("update_state", this.state);
+    this.disconnect();
+  } else {
+    this.broadcast("update_state", { fen: this.chessGame.fen() });
+  }
 }
   onJoin (client: Client, options : { playerName: string }) {
     console.log(client.sessionId, "joined with name:", options.playerName);

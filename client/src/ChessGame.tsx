@@ -30,6 +30,8 @@ function ChessGame() {
   const [moves, setMoves] = useState([]); 
   const [playerName, setPlayerName] = useState("");
   const [opponentName, setOpponentName] = useState("");
+  const [gameOver, setGameOver] = useState(false);
+  const [gameResult, setGameResult] = useState("");
 
   useEffect(() => {
     if (room) {
@@ -72,6 +74,12 @@ function ChessGame() {
         toast.error(message.message);
 
         console.log("error", message.message);
+      });
+
+      room.onMessage("game_over", (message) => {
+        setGameOver(true);
+        setGameResult(`${message.status} - Winner: ${message.winner}`);
+        toast.info(`Game Over: ${message.status} - Winner: ${message.winner}`);
       });
 
       room.onMessage<PlayerNameInfo[]>("names_update", (message) => {
@@ -137,11 +145,13 @@ function ChessGame() {
                 </p>
               )}
               <div>Game : {playerName} vs {opponentName}</div>
+              <p>{gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}</p>
+              {!gameOver && (
               <Chessboard
                 boardOrientation={isWhite ? "white" : "black"}
                 position={game.fen()}
                 onPieceDrop={onPieceDrop}
-              />
+              />)}
               <MoveHistory moves={moves} />
             </>
           )}

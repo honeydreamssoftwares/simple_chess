@@ -5,7 +5,7 @@ interface MoveHistoryProps {
 
 function MoveHistory({ moves }: MoveHistoryProps) {
     return (
-        <div className="move-history-container">
+        moves && <div className="move-history-container">
             <h2>Move History</h2>
             <ul className="move-list">
                 {moves.map((move, index) => (
