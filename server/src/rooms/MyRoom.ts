@@ -4,7 +4,7 @@ import { MyRoomState } from "./schema/MyRoomState";
 import PlayerMove from "./schema/PlayerMove";
 import { Chess } from "chess.js"; 
 import { type, ArraySchema } from "@colyseus/schema";
-import ErrorMessage from "./schema/ErrorMessage";
+import { PlayerDetails } from './schema/PlayerDetails';
 
 
 
@@ -22,6 +22,16 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage("player_move", (client: Client, data: { from: string; to: string }) => {
       try {
 
+        const playerDetails = this.state.players.get(client.sessionId);
+        console.log("turn",this.chessGame.turn(),playerDetails.color)
+        const currentPlayerColor = this.chessGame.turn() === 'w' ? 'white' : 'black';
+
+        if (!playerDetails || playerDetails.color !== currentPlayerColor) {
+    
+          client.send("error",{message:"Not your turn!"});
+            return;
+        }
+
         if (this.moveTimeout) {
           clearTimeout(this.moveTimeout);  
         }
@@ -31,12 +41,10 @@ export class MyRoom extends Room<MyRoomState> {
 
           if (move === null) {
               console.log("Illegal move attempted by", client.sessionId);
-              const errorMessage =new ErrorMessage(); 
-              errorMessage.type="error";
-              errorMessage.message="Illegal move!!!";
+           
 
-            this.send(client,errorMessage);           
-             return; 
+              client.send("error",{message:"Illegal move!!!"});
+              return; 
           }
 
           // Move is legal, update the FEN in the room state
@@ -62,16 +70,16 @@ export class MyRoom extends Room<MyRoomState> {
         
         } catch (error) {
           console.error("Error processing move:", error);
-
-          const errorMessage =new ErrorMessage(); 
-          errorMessage.type="error";
-          errorMessage.message="Failed to process the move!";
-          this.send(client, errorMessage);
-      }
+          client.send("error",{message:"Failed to process the move!"});
+        }
   });
 }
   onJoin (client: Client, options: any) {
     console.log(client.sessionId, "joined!");
+
+    const playerDetails = new PlayerDetails();
+        playerDetails.color = this.clients.length === 1 ? 'white' : 'black';
+        this.state.players.set(client.sessionId, playerDetails);
     if (this.clients.length === 1) {
       client.send("color_assignment", { color: "white" });
     } else {

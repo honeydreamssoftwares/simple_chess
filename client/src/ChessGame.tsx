@@ -59,6 +59,13 @@ function ChessGame() {
         setPlayerColor(message.color);
         console.log("player_colour", message.color);
       });
+      room.onMessage("error", (message) => {
+        toast.error(message.message);
+
+        console.log("error", message.message);
+      });
+
+
     }
   }, [room]);
 

@@ -1,6 +1,7 @@
-import { Schema, type, ArraySchema } from "@colyseus/schema";
+import { Schema, type,ArraySchema ,MapSchema  } from "@colyseus/schema";
 import PlayerMove from "./PlayerMove";
-import ErrorMessage from "./ErrorMessage";
+import { PlayerDetails } from "./PlayerDetails";
+
 export class MyRoomState extends Schema {
 
   @type("string") mySynchronizedProperty: string = "Hello world";
@@ -8,7 +9,9 @@ export class MyRoomState extends Schema {
   @type("string")
   fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; 
 
-  @type(ErrorMessage) errormessage=new (ErrorMessage)
+
+  @type({ map: PlayerDetails })
+  players: MapSchema<PlayerDetails> = new MapSchema<PlayerDetails>();
 
   
 
