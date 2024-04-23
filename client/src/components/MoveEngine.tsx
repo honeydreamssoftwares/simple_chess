@@ -2,7 +2,6 @@ import React, { useState, useCallback } from "react";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { toast, ToastContainer } from 'react-toastify';
-import * as Colyseus from "colyseus.js";
 export default function MoveEngine() {
   const [game, setGame] = useState(new Chess());
 
@@ -52,12 +51,7 @@ console.log('moveStr',moveStr)
   }, [makeAMove, makeRandomMove]);
 
 
-  const client = new Colyseus.Client('ws://localhost:2567');
-  client.joinOrCreate("my_room").then(room => {
-    console.log(room.sessionId, "joined", room.name);
-}).catch(e => {
-    console.log("JOIN ERROR", e);
-});
+ 
   return (
     <>
       <Chessboard position={game.fen()} onPieceDrop={onDrop} />
