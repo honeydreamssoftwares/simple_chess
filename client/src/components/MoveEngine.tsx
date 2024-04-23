@@ -1,11 +1,18 @@
-import React, { useState, useCallback } from "react";
+import  { useState } from "react";
 import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { toast, ToastContainer } from 'react-toastify';
-export default function MoveEngine() {
-  const [game, setGame] = useState(new Chess());
+import {ToastContainer } from 'react-toastify';
 
-  const makeAMove = useCallback((move: { from: string; to: string; promotion?: string }|string) => {
+
+interface MoveEngineProps {
+  onPieceDrop?: (sourceSquare: Square, targetSquare: Square) => boolean;
+}
+
+
+export default function MoveEngine({ onPieceDrop }: MoveEngineProps) {
+  const [game] = useState(new Chess());
+
+  /* const makeAMove = useCallback((move: { from: string; to: string; promotion?: string }|string) => {
     try {
       const result = game.move(move);
       if (!result) {
@@ -20,8 +27,8 @@ export default function MoveEngine() {
       return null; // Return null if the move was illegal or an error occurred
     }
   }, [game]);
-
-  const makeRandomMove = useCallback(() => {
+ */
+  /* const makeRandomMove = useCallback(() => {
     const possibleMoves = game.moves();
     if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0) {
       return; // exit if the game is over
@@ -36,8 +43,8 @@ console.log('moveStr',moveStr)
 
 
   }, [game, makeAMove]);
-
-  const onDrop = useCallback((sourceSquare:Square, targetSquare:Square) => {
+ */
+  /* const onDrop = useCallback((sourceSquare:Square, targetSquare:Square) => {
     const move = {
       from: sourceSquare,
       to: targetSquare,
@@ -49,12 +56,12 @@ console.log('moveStr',moveStr)
     setTimeout(makeRandomMove, 200); // Delay to simulate think time
     return true;
   }, [makeAMove, makeRandomMove]);
-
+ */
 
  
   return (
     <>
-      <Chessboard position={game.fen()} onPieceDrop={onDrop} />
+      <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} />
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
     </>
   );

@@ -1,7 +1,10 @@
-import { Schema, Context, type } from "@colyseus/schema";
+import { Schema, type, ArraySchema } from "@colyseus/schema";
+import PlayerMove from "./PlayerMove";
 
 export class MyRoomState extends Schema {
 
   @type("string") mySynchronizedProperty: string = "Hello world";
+  @type([PlayerMove]) moves: ArraySchema<PlayerMove> = new ArraySchema<PlayerMove>();
+
 
 }
