@@ -4,7 +4,7 @@ import PlayerMove from "./PlayerMove";
 export class MyRoomState extends Schema {
 
   @type("string") mySynchronizedProperty: string = "Hello world";
-  @type([PlayerMove]) moves: ArraySchema<PlayerMove> = new ArraySchema<PlayerMove>();
+  @type(PlayerMove) moves: PlayerMove = new PlayerMove();
 
 
 }

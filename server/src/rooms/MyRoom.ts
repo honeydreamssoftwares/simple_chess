@@ -1,5 +1,6 @@
 import { Room, Client } from "@colyseus/core";
 import { MyRoomState } from "./schema/MyRoomState";
+import PlayerMove from "./schema/PlayerMove";
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 2;
@@ -11,6 +12,13 @@ export class MyRoom extends Room<MyRoomState> {
       //
       // handle "type" message
       //
+    });
+
+    this.onMessage("player_move", (client, data) => {
+      const move: PlayerMove = this.state.moves;
+      move.from=data.from;
+      move.to=data.to;
+      console.log(client.sessionId + " Moved from  " + move.from, "y: " + move.to);
     });
   }
 
