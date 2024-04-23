@@ -1,4 +1,4 @@
-import React, { useState,useCallback,useEffect } from 'react';
+import React, { useState,useEffect } from 'react';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import * as Colyseus from "colyseus.js";
@@ -48,6 +48,7 @@ function App() {
 
     room.onMessage("game_start", message => {
       console.log(message);
+      toast.info("Game Started..");
       // Handle game start
   });
 
@@ -77,43 +78,18 @@ function App() {
     }
   };
 
-    const makeAMove = useCallback((move: { from: string; to: string; promotion?: string }|string) => {
-    try {
-      const result = game.move(move);
-      if (!result) {
-        throw new Error('Illegal move');
-      }
-      setGame(new Chess(game.fen())); // Properly cloning to trigger a React re-render
-      return result;
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message); // Displaying the error message using react-toastify
-      }
-      return null; // Return null if the move was illegal or an error occurred
-    }
-  }, [game]);
+    
  
 
 
   const customOnPieceDrop = (sourceSquare:Square, targetSquare:Square) => {
     // Custom logic for handling piece drop
     console.log(`Piece moved from ${sourceSquare} to ${targetSquare}`);
-
-    const move = {
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: "q" // Always promote to a queen for example simplicity
-    };
-    const result = makeAMove(move);
-
-    if (result === null) return false; // Illegal move
-    
     if(room){
       room.send("player_move",{
         from:sourceSquare,
         to:targetSquare
       })
-
     }
 
     return true;  // You need to manage game state or any other operations needed
