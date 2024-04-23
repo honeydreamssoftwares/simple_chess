@@ -6,7 +6,7 @@ import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { ToastContainer, toast } from "react-toastify";
 import MoveHistory from "./MoveHistory";
-
+import "./App.css";
 interface PlayerNameInfo {
   id: string;  // The session ID of the player
   name: string;  // The name of the player
@@ -187,7 +187,7 @@ function ChessGame() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center items-center">
-      <h1 className="text-3xl font-bold text-center mb-4">Simple Multiplayer Chess</h1>
+      <h1 className="text-3xl font-bold text-center mb-12">Simple Multiplayer Chess</h1>
       <div className="w-full max-w-md">
         {errorBlock()}
         {room ? roomBlock() : playerEntryBlock()}
