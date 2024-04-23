@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import * as Colyseus from "colyseus.js";
 import { Room } from "colyseus.js";
-import { Chess, Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { ToastContainer, toast } from "react-toastify";
 import MoveHistory from "./MoveHistory";
@@ -20,7 +19,8 @@ function ChessGame() {
   );
   const [room, setRoom] = useState<Room<unknown> | null>(null);
   const [error, setError] = useState("");
-  const [game, setGame] = useState(new Chess());
+  const [fen, setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
   const [playerCount, setPlayerCount] = useState(0);
   const [isWhite, setIsWhite] = useState(true); // True if this client plays as White
   const [turn, setTurn] = useState("white");
@@ -39,7 +39,7 @@ function ChessGame() {
 
       room.onMessage("update_state", (message) => {
         console.log("updating_ game", message);
-        setGame(new Chess(message.fen));
+        setFen(message.fen);
         setTurn(message.turn);
         setMoves(message.moves); 
       });
@@ -109,7 +109,7 @@ function ChessGame() {
     }
   };
 
-  const onPieceDrop = (sourceSquare: Square, targetSquare: Square) => {
+  const onPieceDrop = (sourceSquare: string, targetSquare: string) => {
  
     console.log(`Piece moved from ${sourceSquare} to ${targetSquare}`);
     if (room) {
@@ -149,7 +149,7 @@ function ChessGame() {
       {!gameOver && (
         <Chessboard
           boardOrientation={isWhite ? "white" : "black"}
-          position={game.fen()}
+          position={fen}
           onPieceDrop={onPieceDrop}
         />
       )}
