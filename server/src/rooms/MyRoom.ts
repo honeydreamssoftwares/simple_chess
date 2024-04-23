@@ -23,7 +23,7 @@ export class MyRoom extends Room<MyRoomState> {
       try {
 
         if (this.moveTimeout) {
-          clearTimeout(this.moveTimeout);  // Clear the existing timeout when a new move is made
+          clearTimeout(this.moveTimeout);  
         }
 
 
@@ -35,9 +35,8 @@ export class MyRoom extends Room<MyRoomState> {
               errorMessage.type="error";
               errorMessage.message="Illegal move!!!";
 
-            // Send the error message to the client
             this.send(client,errorMessage);           
-             return; // Do not proceed with updating anything
+             return; 
           }
 
           // Move is legal, update the FEN in the room state
@@ -45,12 +44,14 @@ export class MyRoom extends Room<MyRoomState> {
           const playerMove = new PlayerMove();
           playerMove.from = data.from;
           playerMove.to = data.to;
-          this.state.moves.push(playerMove); // Assuming 'moves' is an array to track history
+          playerMove.san = move.san; 
+          this.state.moves.push(playerMove); 
 
           // Broadcast updated FEN to all clients
           this.broadcast("update_state", {
             fen: this.chessGame.fen(),
-            turn: this.chessGame.turn() === 'w' ? 'white' : 'black'
+            turn: this.chessGame.turn() === 'w' ? 'white' : 'black',
+            moves: this.state.moves.map(m => m.san) 
           });
 
           // Set a timeout to enforce move timer

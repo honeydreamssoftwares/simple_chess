@@ -66,3 +66,26 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+
+.move-history-container {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #1d1818;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.move-list {
+  list-style: none;
+  padding: 0;
+}
+
+.move-item {
+  padding: 5px 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.move-item:last-child {
+  border-bottom: none;
+}
