@@ -9,6 +9,13 @@ import { Chessboard } from "react-chessboard";
 import { ToastContainer, toast } from "react-toastify";
 import MoveHistory from "./MoveHistory";
 
+interface PlayerNameInfo {
+  id: string;  // The session ID of the player
+  name: string;  // The name of the player
+}
+
+
+
 function ChessGame() {
   const [client] = useState(
     new Colyseus.Client(import.meta.env.VITE_SERVER_URL)
@@ -21,6 +28,8 @@ function ChessGame() {
   const [turn, setTurn] = useState("white");
   const [playerColor, setPlayerColor] = useState("");
   const [moves, setMoves] = useState([]); 
+  const [playerName, setPlayerName] = useState("");
+  const [opponentName, setOpponentName] = useState("");
 
   useEffect(() => {
     if (room) {
@@ -65,13 +74,26 @@ function ChessGame() {
         console.log("error", message.message);
       });
 
+      room.onMessage<PlayerNameInfo[]>("names_update", (message) => {
+        console.log("names_update",message);
+        message.forEach(n => {
+          if (n.id !== room.sessionId) {  
+            setOpponentName(n.name);
+          }
+        });
+      });
+
 
     }
   }, [room]);
 
   const connectToRoom = async () => {
+    if (!playerName) {
+      toast.error("Please enter your name before joining.");
+      return;
+    }
     try {
-      const joinedRoom = await client.joinOrCreate("my_room");
+      const joinedRoom = await client.joinOrCreate("my_room", { playerName });
       console.log(joinedRoom.sessionId, "joined", joinedRoom.name);
       setRoom(joinedRoom);
     } catch (e) {
@@ -114,6 +136,7 @@ function ChessGame() {
                     : "Waiting for opponent's move..."}
                 </p>
               )}
+              <div>Game : {playerName} vs {opponentName}</div>
               <Chessboard
                 boardOrientation={isWhite ? "white" : "black"}
                 position={game.fen()}
@@ -124,7 +147,14 @@ function ChessGame() {
           )}
         </>
       ) : (
+        <>
+        <input
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            placeholder="Enter your name"
+          />
         <button onClick={connectToRoom}>Play now</button>
+        </>
       )}
       <ToastContainer
         position="top-right"

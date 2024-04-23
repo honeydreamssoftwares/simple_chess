@@ -74,11 +74,12 @@ export class MyRoom extends Room<MyRoomState> {
         }
   });
 }
-  onJoin (client: Client, options: any) {
-    console.log(client.sessionId, "joined!");
+  onJoin (client: Client, options : { playerName: string }) {
+    console.log(client.sessionId, "joined with name:", options.playerName);
 
     const playerDetails = new PlayerDetails();
         playerDetails.color = this.clients.length === 1 ? 'white' : 'black';
+        playerDetails.name=options.playerName;
         this.state.players.set(client.sessionId, playerDetails);
     if (this.clients.length === 1) {
       client.send("color_assignment", { color: "white" });
@@ -86,7 +87,20 @@ export class MyRoom extends Room<MyRoomState> {
       client.send("color_assignment", { color: "black" });
     }
   
-    this.broadcast("player_joined", { sessionId: client.sessionId, numberOfPlayers: this.clients.length });
+    this.broadcast("player_joined", {
+       sessionId: client.sessionId, 
+       name: options.playerName,
+       numberOfPlayers: this.clients.length
+       });
+
+       if (this.clients.length === 2) {
+        const names = this.clients.map(c => ({
+          id: c.sessionId,
+          name: this.state.players.get(c.sessionId).name
+        }));
+        console.log("names_update", names);
+        this.broadcast("names_update", names);
+      }
   }
   
   onLeave (client: Client, consented: boolean) {
