@@ -10,7 +10,7 @@ import {ToastContainer ,toast} from 'react-toastify';
 
 
 function ChessGame() {
-  const [client] = useState(new Colyseus.Client('ws://localhost:2567'));
+  const [client] = useState(new Colyseus.Client(import.meta.env.VITE_SERVER_URL));
   const [room, setRoom] = useState<Room<unknown> | null>(null);
   const [error, setError] = useState('');
   const [game,setGame] = useState(new Chess());
@@ -43,11 +43,11 @@ function ChessGame() {
 
 
     room.onMessage("player_joined", (message) => {
-      setPlayerCount(message.numberOfPlayers); // Update player count when new player joins
+      setPlayerCount(message.numberOfPlayers); 
     });
 
     room.onMessage("player_left", (message) => {
-      setPlayerCount(message.numberOfPlayers); // Update player count when a player leaves
+      setPlayerCount(message.numberOfPlayers); 
     });
 
 
@@ -86,6 +86,8 @@ function ChessGame() {
     } catch (e) {
       console.error("JOIN ERROR", e);
       setError("Failed to connect: " + (e as Error).message);
+      toast.error("Failed to connect: " + (e as Error).message);
+
     }
   };
 
