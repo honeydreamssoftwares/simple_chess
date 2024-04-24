@@ -21,6 +21,7 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage("player_move", (client: Client, data: { from: string; to: string }) => {
       try {
 
+        //Check if the player has turn 
         const playerDetails = this.state.players.get(client.sessionId);
         console.log("turn",this.chessGame.turn(),playerDetails.color)
         const currentPlayerColor = this.chessGame.turn() === 'w' ? 'white' : 'black';
@@ -31,11 +32,13 @@ export class MyRoom extends Room<MyRoomState> {
             return;
         }
 
+        //Reset move timeout 
         if (this.moveTimeout) {
           clearTimeout(this.moveTimeout);  
         }
 
 
+        //Attemt to move peice
           const move = this.chessGame.move({ from: data.from, to: data.to });
 
           if (move === null) {
@@ -45,8 +48,8 @@ export class MyRoom extends Room<MyRoomState> {
               client.send("error",{message:"Illegal move!!!"});
               return; 
           }
-            //Valid move
 
+          //Check if this move does not Clears the game state
             this.checkGameStatus(client);
 
 
@@ -56,9 +59,10 @@ export class MyRoom extends Room<MyRoomState> {
           playerMove.from = data.from;
           playerMove.to = data.to;
           playerMove.san = move.san; 
+          //Save list of moves
           this.state.moves.push(playerMove); 
 
-          // Broadcast updated FEN to all clients
+          // Broadcast updated FEN/Turn/Moves to all clients
           this.broadcast("update_state", {
             fen: this.chessGame.fen(),
             turn: this.chessGame.turn() === 'w' ? 'white' : 'black',
@@ -67,7 +71,7 @@ export class MyRoom extends Room<MyRoomState> {
 
           // Set a timeout to enforce move timer
         this.moveTimeout = setTimeout(() => {
-          // Code to handle timeout scenario, e.g., force a move, end the game, etc.
+         
           const gameResult = { winner: "", status: "", fen: this.chessGame.fen() };
           gameResult.status = "Draw";
           gameResult.winner = this.chessGame.turn() === 'w' ? 'Black' : 'White';

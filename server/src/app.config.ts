@@ -26,6 +26,8 @@ export default config({
             res.send("Hello deploy");
         });
 
+      
+
         /**
          * Use @colyseus/playground
          * (It is not recommended to expose this route in a production environment)
