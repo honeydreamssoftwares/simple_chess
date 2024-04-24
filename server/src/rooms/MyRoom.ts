@@ -10,6 +10,7 @@ export class MyRoom extends Room<MyRoomState> {
   private chessGame: Chess;
   maxClients = 2;
   private moveTimeout: NodeJS.Timeout | null = null;
+  private timeOutMillisec=300000;
 
 
   onCreate (options: any) {
@@ -74,7 +75,7 @@ export class MyRoom extends Room<MyRoomState> {
 
 
           this.broadcast("move_timeout", "Player did not make a move in time.");
-        }, 10000); // 10 seconds timeout
+        }, this.timeOutMillisec); 
         
         } catch (error) {
           console.error("Error processing move:", error);
