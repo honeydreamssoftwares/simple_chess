@@ -25,6 +25,8 @@ jobs:
         ssh -o StrictHostKeyChecking=no root@135.181.41.229  << 'EOF'
           cd ~/simple_chess/server
           git pull origin main
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
           npm install
           npm run build 
           pm2 restart all  
