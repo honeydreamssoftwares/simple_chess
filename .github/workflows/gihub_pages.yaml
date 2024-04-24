@@ -12,10 +12,10 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
-          npm ci
-          npm run build
+          cd ./client & npm ci
+          cd ./client & npm run build
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: client/dist 
+          folder: ./client/dist 
