@@ -96,11 +96,9 @@ checkGameStatus(client: Client) {
 
   if (gameResult.status) {
     this.broadcast("game_over", gameResult);
-    this.state.fen = this.chessGame.fen();  // Update the state with the final position
+    this.state.fen = this.chessGame.fen(); 
     this.broadcast("update_state", this.state);
     this.disconnect();
-  } else {
-    this.broadcast("update_state", { fen: this.chessGame.fen() });
   }
 }
   onJoin (client: Client, options : { playerName: string }) {
