@@ -23,7 +23,7 @@ jobs:
         run: |
           cd server
           npm install
-          npm build
+          npm run build
           cd ..
           cd client
           npm install
