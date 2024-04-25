@@ -10,6 +10,25 @@ export class MyRoom extends Room<MyRoomState> {
   private moveTimeout: NodeJS.Timeout | null = null;
   private timeOutMillisec = 300000;
 
+
+  areBothPlayersAvailable():boolean{
+    return this.clients.length === 2;
+  }
+
+  currentNumberOfPlayers():number{
+    return this.clients.length;
+  }
+
+  getAllPayersDetails(){
+  return this.clients.map((c) => ({
+    id: c.sessionId,
+    name: this.state.players.get(c.sessionId).name,
+  }));
+  }
+
+
+  //Events
+
   onCreate(options: any) {
     this.setState(new MyRoomState());
     this.chessGame = new Chess();
@@ -113,24 +132,22 @@ export class MyRoom extends Room<MyRoomState> {
   onJoin(client: Client, options: { playerName: string }) {
     console.log(client.sessionId, "joined with name:", options.playerName);
 
+
     const playerDetails = new PlayerDetails();
-    playerDetails.color = this.clients.length === 1 ? "white" : "black";
+    playerDetails.color = this.currentNumberOfPlayers() === 1 ? "white" : "black";
     playerDetails.name = options.playerName;
+    //Save state
     this.state.players.set(client.sessionId, playerDetails);
     client.send("color_assignment", { color: playerDetails.color  });
    
 
+    //Every time a player joins inform both of the number of players
     this.broadcast("player_joined", {
-      sessionId: client.sessionId,
-      name: options.playerName,
-      numberOfPlayers: this.clients.length,
+      numberOfPlayers: this.currentNumberOfPlayers(),
     });
 
-    if (this.clients.length === 2) {
-      const names = this.clients.map((c) => ({
-        id: c.sessionId,
-        name: this.state.players.get(c.sessionId).name,
-      }));
+    if (this.areBothPlayersAvailable()) {
+      const names = this.getAllPayersDetails();
       console.log("names_update", names);
       this.broadcast("names_update", names);
     }

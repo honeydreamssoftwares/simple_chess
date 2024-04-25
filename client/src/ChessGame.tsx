@@ -75,9 +75,9 @@ function ChessGame() {
         console.log("error", message.message);
       });
 
-/*       room.onStateChange((state) => {
+      room.onStateChange((state) => {
         console.log(room.name, "has new state:", state);
-      }); */
+      }); 
 
 
 
