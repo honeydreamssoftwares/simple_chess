@@ -1,6 +1,7 @@
+import { ChessMove } from "./types/ChessGameTypes";
 
 interface MoveHistoryProps {
-    moves: string[];
+    moves: ChessMove[] | null;
 }
 
 function MoveHistory({ moves }: MoveHistoryProps) {
@@ -11,7 +12,7 @@ function MoveHistory({ moves }: MoveHistoryProps) {
                 <ul className="list-decimal list-inside">
                     {moves.map((move, index) => (
                         <li key={index} className="text-gray-700">
-                            {index + 1}. {move}
+                             {move.san}
                         </li>
                     ))}
                 </ul>

@@ -6,11 +6,7 @@ import { Chessboard } from "react-chessboard";
 import { ToastContainer, toast } from "react-toastify";
 import MoveHistory from "./MoveHistory";
 import "./App.css";
-interface PlayerNameInfo {
-  id: string;  // The session ID of the player
-  name: string;  // The name of the player
-}
-
+import { ChessMove, PlayerNameInfo, RoomState } from "./types/ChessGameTypes";
 
 
 function ChessGame() {
@@ -25,7 +21,7 @@ function ChessGame() {
   const [isWhite, setIsWhite] = useState(true); // True if this client plays as White
   const [turn, setTurn] = useState("white");
   const [playerColor, setPlayerColor] = useState("");
-  const [moves, setMoves] = useState([]); 
+  const [moves, setMoves] = useState<ChessMove[] | null >(null); 
   const [playerName, setPlayerName] = useState("");
   const [opponentName, setOpponentName] = useState("");
   const [gameOver, setGameOver] = useState(false);
@@ -54,9 +50,9 @@ function ChessGame() {
       //When there is a move by player
       room.onMessage("update_state", (message) => {
         console.log("updating_ game", message);
-        setFen(message.fen);
+       // setFen(message.fen);
         setTurn(message.turn);
-        setMoves(message.moves); 
+       // setMoves(message.moves.map((m:ChessMove) => m.san)); 
       });
 
       room.onMessage("player_left", (message) => {
@@ -75,8 +71,11 @@ function ChessGame() {
         console.log("error", message.message);
       });
 
-      room.onStateChange((state) => {
-        console.log(room.name, "has new state:", state);
+      room.onStateChange((state:unknown) => {
+        const typedState = state as RoomState;
+        console.log(room.name, "has new state:", typedState);
+        setFen(typedState.fen); 
+        setMoves(typedState.moves); 
       }); 
 
 
