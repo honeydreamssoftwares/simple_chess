@@ -134,7 +134,7 @@ export class MyRoom extends Room<MyRoomState> {
     this.state.players.set(client.sessionId, playerDetails);
     this.state.number_of_players=this.currentNumberOfPlayers();
 
-    client.send("color_assignment", { color: playerDetails.color  });
+    //client.send("color_assignment", { color: playerDetails.color  });
    
 
     //Every time a player joins inform both of the number of players
@@ -142,11 +142,11 @@ export class MyRoom extends Room<MyRoomState> {
       numberOfPlayers: this.currentNumberOfPlayers(),
     }); */
 
-    if (this.areBothPlayersAvailable()) {
+/*     if (this.areBothPlayersAvailable()) {
       const names = this.getAllPayersDetails();
       console.log("names_update", names);
       this.broadcast("names_update", names);
-    }
+    } */
   }
 
   onLeave(client: Client, consented: boolean) {
