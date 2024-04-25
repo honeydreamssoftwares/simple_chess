@@ -1,6 +1,8 @@
+import type PlayerMove from "../../server/src/rooms/schema/PlayerMove"
+import { ArraySchema  } from "@colyseus/schema";
 
 interface MoveHistoryProps {
-    moves: string[];
+    moves: ArraySchema<PlayerMove> | null;
 }
 
 function MoveHistory({ moves }: MoveHistoryProps) {
@@ -11,7 +13,7 @@ function MoveHistory({ moves }: MoveHistoryProps) {
                 <ul className="list-decimal list-inside">
                     {moves.map((move, index) => (
                         <li key={index} className="text-gray-700">
-                            {index + 1}. {move}
+                             {move.san}
                         </li>
                     ))}
                 </ul>

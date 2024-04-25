@@ -1,77 +1,46 @@
 import { useState, useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import * as Colyseus from "colyseus.js";
-import { Room } from "colyseus.js";
+//import { Room } from "colyseus.js";
 import { Chessboard } from "react-chessboard";
 import { ToastContainer, toast } from "react-toastify";
 import MoveHistory from "./MoveHistory";
 import "./App.css";
-interface PlayerNameInfo {
-  id: string;  // The session ID of the player
-  name: string;  // The name of the player
-}
+import type { MyRoomState } from "../../server/src/rooms/schema/MyRoomState";
+import type PlayerMove from "../../server/src/rooms/schema/PlayerMove";
 
-
+import { ArraySchema } from "@colyseus/schema";
 
 function ChessGame() {
   const [client] = useState(
     new Colyseus.Client(import.meta.env.VITE_SERVER_URL)
   );
-  const [room, setRoom] = useState<Room<unknown> | null>(null);
+  const [room, setRoom] = useState<Colyseus.Room<MyRoomState>>();
   const [error, setError] = useState("");
-  const [fen, setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  const [fen, setFen] = useState(
+    "start"
+  );
 
   const [playerCount, setPlayerCount] = useState(0);
   const [isWhite, setIsWhite] = useState(true); // True if this client plays as White
   const [turn, setTurn] = useState("white");
   const [playerColor, setPlayerColor] = useState("");
-  const [moves, setMoves] = useState([]); 
+  const [moves, setMoves] = useState<ArraySchema<PlayerMove> | null>(null);
   const [playerName, setPlayerName] = useState("");
-  const [opponentName, setOpponentName] = useState("");
+  const [opponentName, setOpponentName] = useState<string>("");
   const [gameOver, setGameOver] = useState(false);
   const [gameResult, setGameResult] = useState("");
 
   useEffect(() => {
     if (room) {
-      room.onStateChange((state) => {
-        console.log(room.name, "has new state:", state);
-      });
-
-      room.onMessage("update_state", (message) => {
-        console.log("updating_ game", message);
-        setFen(message.fen);
-        setTurn(message.turn);
-        setMoves(message.moves); 
-      });
-
-      room.onMessage("player_joined", (message) => {
-        setPlayerCount(message.numberOfPlayers);
-      });
-
-      room.onMessage("player_left", (message) => {
-        setPlayerCount(message.numberOfPlayers);
-      });
-
       room.onMessage("game_start", (message) => {
         console.log(message);
         toast.info("Game Started..");
       });
 
       room.onMessage("waiting_for_player", (message) => {
-        console.log(message);
+       // console.log(message);
         toast.info("Waiting for player..");
-      });
-
-      room.onMessage("color_assignment", (message) => {
-        setIsWhite(message.color === "white");
-
-        setPlayerColor(message.color);
-        console.log("player_colour", message.color);
-      });
-      room.onMessage("error", (message) => {
-        toast.error(message.message);
-
-        console.log("error", message.message);
       });
 
       room.onMessage("game_over", (message) => {
@@ -80,16 +49,36 @@ function ChessGame() {
         toast.info(`Game Over: ${message.status} - Winner: ${message.winner}`);
       });
 
-      room.onMessage<PlayerNameInfo[]>("names_update", (message) => {
-        console.log("names_update",message);
-        message.forEach(n => {
-          if (n.id !== room.sessionId) {  
-            setOpponentName(n.name);
+      room.onMessage("error", (message) => {
+        toast.error(message.message);
+
+        console.log("error", message.message);
+      });
+
+      room.onStateChange((state) => {
+        console.log(room.name, "has new state:", state);
+        setFen(state.fen);
+        setMoves(state.moves);
+        setTurn(state.turn_of_player);
+        setPlayerCount(state.number_of_players);
+
+        //Opponent name
+        if (state.number_of_players === 2) {
+          state.players.forEach((details, sessionId) => {
+            if (sessionId !== room.sessionId) {
+              setOpponentName(details.name);
+            }
+          });
+        }
+
+        // Own colour
+        state.players.forEach((details, sessionId) => {
+          if (sessionId === room.sessionId) {
+            setIsWhite(details.color === "white");
+            setPlayerColor(details.color);
           }
         });
       });
-
-
     }
   }, [room]);
 
@@ -99,7 +88,9 @@ function ChessGame() {
       return;
     }
     try {
-      const joinedRoom = await client.joinOrCreate("my_room", { playerName });
+      const joinedRoom = await client.joinOrCreate<MyRoomState>("my_room", {
+        playerName,
+      });
       console.log(joinedRoom.sessionId, "joined", joinedRoom.name);
       setRoom(joinedRoom);
     } catch (e) {
@@ -110,7 +101,6 @@ function ChessGame() {
   };
 
   const onPieceDrop = (sourceSquare: string, targetSquare: string) => {
- 
     console.log(`Piece moved from ${sourceSquare} to ${targetSquare}`);
     if (room) {
       room.send("player_move", {
@@ -119,19 +109,24 @@ function ChessGame() {
       });
     }
 
-    return true; 
+    return true;
   };
 
-  const isPlayerAlone=()=>{
-    return (playerCount < 2 ? true:false)
-  }
-  const errorBlock = () => (
-    error && <p className="text-red-500 text-center">{error}</p>
-  );
+  const isPlayerAlone = () => {
+    return playerCount < 2 ? true : false;
+  };
+  const errorBlock = () =>
+    error && <p className="text-red-500 text-center">{error}</p>;
 
   const whosTurnBlock = () => (
-    <p className={`text-lg font-semibold ${turn === playerColor ? 'text-green-500' : 'text-red-500'}`}>
-      {turn === playerColor ? "It's your turn!" : "Waiting for opponent's move..."}
+    <p
+      className={`text-lg font-semibold ${
+        turn === playerColor ? "text-green-500" : "text-red-500"
+      }`}
+    >
+      {turn === playerColor
+        ? "It's your turn!"
+        : "Waiting for opponent's move..."}
     </p>
   );
 
@@ -145,7 +140,9 @@ function ChessGame() {
     <>
       {whosTurnBlock()}
       {versesBlock()}
-      <p className="mb-4">{gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}</p>
+      <p className="mb-4">
+        {gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}
+      </p>
       {!gameOver && (
         <Chessboard
           boardOrientation={isWhite ? "white" : "black"}
@@ -160,7 +157,11 @@ function ChessGame() {
     <div className="flex flex-row justify-center items-start space-x-8">
       <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg">
         <div>Room ID: {room?.id}</div>
-        {isPlayerAlone() ? <p>Waiting for an opponent...</p> : mainGameAreaBlock()}
+        {isPlayerAlone() ? (
+          <p>Waiting for an opponent...</p>
+        ) : (
+          mainGameAreaBlock()
+        )}
       </div>
       <div className="w-64">
         <MoveHistory moves={moves} />
@@ -187,7 +188,9 @@ function ChessGame() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center items-center">
-      <h1 className="text-3xl font-bold text-center mb-12">Simple Multiplayer Chess</h1>
+      <h1 className="text-3xl font-bold text-center mb-12">
+        Simple Multiplayer Chess
+      </h1>
       <div className="w-full max-w-md">
         {errorBlock()}
         {room ? roomBlock() : playerEntryBlock()}
