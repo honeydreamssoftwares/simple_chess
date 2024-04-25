@@ -39,7 +39,7 @@ function ChessGame() {
       });
 
       room.onMessage("waiting_for_player", (message) => {
-       // console.log(message);
+        console.log(message);
         toast.info("Waiting for player..");
       });
 
@@ -58,7 +58,7 @@ function ChessGame() {
       room.onStateChange((state) => {
         console.log(room.name, "has new state:", state);
         setFen(state.fen);
-        setMoves(state.moves);
+        setMoves(new ArraySchema<PlayerMove>(...state.moves));
         setTurn(state.turn_of_player);
         setPlayerCount(state.number_of_players);
 
