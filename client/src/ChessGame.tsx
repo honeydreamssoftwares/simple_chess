@@ -18,7 +18,7 @@ function ChessGame() {
   const [room, setRoom] = useState<Colyseus.Room<MyRoomState>>();
   const [error, setError] = useState("");
   const [fen, setFen] = useState(
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    "start"
   );
 
   const [playerCount, setPlayerCount] = useState(0);
