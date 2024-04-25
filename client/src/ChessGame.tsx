@@ -43,9 +43,9 @@ function ChessGame() {
 
       
 
-      room.onMessage("player_joined", (message) => {
+/*       room.onMessage("player_joined", (message) => {
         setPlayerCount(message.numberOfPlayers);
-      });
+      }); */
 
       //When there is a move by player
 /*       room.onMessage("update_state", (message) => {
@@ -54,10 +54,10 @@ function ChessGame() {
        // setTurn(message.turn);
        // setMoves(message.moves.map((m:ChessMove) => m.san)); 
       }); */
-
+/* 
       room.onMessage("player_left", (message) => {
         setPlayerCount(message.numberOfPlayers);
-      });
+      }); */
 
       room.onMessage("game_over", (message) => {
         setGameOver(true);

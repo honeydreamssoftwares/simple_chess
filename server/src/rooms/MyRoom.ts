@@ -138,9 +138,9 @@ export class MyRoom extends Room<MyRoomState> {
    
 
     //Every time a player joins inform both of the number of players
-    this.broadcast("player_joined", {
+/*     this.broadcast("player_joined", {
       numberOfPlayers: this.currentNumberOfPlayers(),
-    });
+    }); */
 
     if (this.areBothPlayersAvailable()) {
       const names = this.getAllPayersDetails();
@@ -158,10 +158,13 @@ export class MyRoom extends Room<MyRoomState> {
       );
     }
 
-    this.broadcast("player_left", {
+    this.state.number_of_players=this.currentNumberOfPlayers();
+
+
+/*     this.broadcast("player_left", {
       sessionId: client.sessionId,
       numberOfPlayers: this.clients.length - 1,
-    });
+    }); */
   }
   onDispose() {
     console.log("room", this.roomId, "disposing...");
