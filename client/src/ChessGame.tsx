@@ -77,6 +77,7 @@ function ChessGame() {
         setFen(typedState.fen); 
         setMoves(typedState.moves); 
         setTurn(typedState.turn_of_player);
+        setPlayerCount(typedState.number_of_players);
 
       }); 
 

@@ -76,13 +76,6 @@ export class MyRoom extends Room<MyRoomState> {
           this.state.moves.push(playerMove);
           this.state.turn_of_player=this.chessGame.turn() === "w" ? "white" : "black";
 
-          // Broadcast updated FEN/Turn/Moves to all clients
-          this.broadcast("update_state", {
-            //fen: this.chessGame.fen(),
-            turn: this.chessGame.turn() === "w" ? "white" : "black",
-           // moves: this.state.moves.map((m) => m.san),
-          });
-
           // Set a timeout to enforce move timer
           this.moveTimeout = setTimeout(() => {
             const gameResult = {
@@ -139,6 +132,8 @@ export class MyRoom extends Room<MyRoomState> {
     playerDetails.name = options.playerName;
     //Save state
     this.state.players.set(client.sessionId, playerDetails);
+    this.state.number_of_players=this.currentNumberOfPlayers();
+
     client.send("color_assignment", { color: playerDetails.color  });
    
 

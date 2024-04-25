@@ -22,6 +22,7 @@ export interface PlayerNameInfo {
     fen: string; // The current position of the game in FEN notation
     players: Record<string, Player>; // Using a Record to map session IDs to players;
     turn_of_player:string;
+    number_of_players:number;
   }
   
   
