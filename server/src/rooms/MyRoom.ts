@@ -74,12 +74,13 @@ export class MyRoom extends Room<MyRoomState> {
           playerMove.san = move.san;
           //Save list of moves
           this.state.moves.push(playerMove);
+          this.state.turn_of_player=this.chessGame.turn() === "w" ? "white" : "black";
 
           // Broadcast updated FEN/Turn/Moves to all clients
           this.broadcast("update_state", {
-            fen: this.chessGame.fen(),
+            //fen: this.chessGame.fen(),
             turn: this.chessGame.turn() === "w" ? "white" : "black",
-            moves: this.state.moves.map((m) => m.san),
+           // moves: this.state.moves.map((m) => m.san),
           });
 
           // Set a timeout to enforce move timer

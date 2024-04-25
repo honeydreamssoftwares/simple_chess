@@ -48,12 +48,12 @@ function ChessGame() {
       });
 
       //When there is a move by player
-      room.onMessage("update_state", (message) => {
+/*       room.onMessage("update_state", (message) => {
         console.log("updating_ game", message);
        // setFen(message.fen);
-        setTurn(message.turn);
+       // setTurn(message.turn);
        // setMoves(message.moves.map((m:ChessMove) => m.san)); 
-      });
+      }); */
 
       room.onMessage("player_left", (message) => {
         setPlayerCount(message.numberOfPlayers);
@@ -76,6 +76,8 @@ function ChessGame() {
         console.log(room.name, "has new state:", typedState);
         setFen(typedState.fen); 
         setMoves(typedState.moves); 
+        setTurn(typedState.turn_of_player);
+
       }); 
 
 
