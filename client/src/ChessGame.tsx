@@ -33,24 +33,7 @@ function ChessGame() {
 
   useEffect(() => {
     if (room) {
-      room.onStateChange((state) => {
-        console.log(room.name, "has new state:", state);
-      });
 
-      room.onMessage("update_state", (message) => {
-        console.log("updating_ game", message);
-        setFen(message.fen);
-        setTurn(message.turn);
-        setMoves(message.moves); 
-      });
-
-      room.onMessage("player_joined", (message) => {
-        setPlayerCount(message.numberOfPlayers);
-      });
-
-      room.onMessage("player_left", (message) => {
-        setPlayerCount(message.numberOfPlayers);
-      });
 
       room.onMessage("game_start", (message) => {
         console.log(message);
@@ -62,16 +45,22 @@ function ChessGame() {
         toast.info("Waiting for player..");
       });
 
-      room.onMessage("color_assignment", (message) => {
-        setIsWhite(message.color === "white");
+      
 
-        setPlayerColor(message.color);
-        console.log("player_colour", message.color);
+      room.onMessage("player_joined", (message) => {
+        setPlayerCount(message.numberOfPlayers);
       });
-      room.onMessage("error", (message) => {
-        toast.error(message.message);
 
-        console.log("error", message.message);
+      //When there is a move by player
+      room.onMessage("update_state", (message) => {
+        console.log("updating_ game", message);
+        setFen(message.fen);
+        setTurn(message.turn);
+        setMoves(message.moves); 
+      });
+
+      room.onMessage("player_left", (message) => {
+        setPlayerCount(message.numberOfPlayers);
       });
 
       room.onMessage("game_over", (message) => {
@@ -79,6 +68,33 @@ function ChessGame() {
         setGameResult(`${message.status} - Winner: ${message.winner}`);
         toast.info(`Game Over: ${message.status} - Winner: ${message.winner}`);
       });
+
+      room.onMessage("error", (message) => {
+        toast.error(message.message);
+
+        console.log("error", message.message);
+      });
+
+/*       room.onStateChange((state) => {
+        console.log(room.name, "has new state:", state);
+      }); */
+
+
+
+
+
+
+
+
+      room.onMessage("color_assignment", (message) => {
+        setIsWhite(message.color === "white");
+
+        setPlayerColor(message.color);
+        console.log("player_colour", message.color);
+      });
+
+
+
 
       room.onMessage<PlayerNameInfo[]>("names_update", (message) => {
         console.log("names_update",message);
