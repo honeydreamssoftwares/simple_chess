@@ -1,7 +1,8 @@
-import { ChessMove } from "./types/ChessGameTypes";
+import type PlayerMove from "../../server/src/rooms/schema/PlayerMove"
+import { ArraySchema  } from "@colyseus/schema";
 
 interface MoveHistoryProps {
-    moves: ChessMove[] | null;
+    moves: ArraySchema<PlayerMove> | null;
 }
 
 function MoveHistory({ moves }: MoveHistoryProps) {

@@ -1,19 +1,23 @@
 import { useState, useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import * as Colyseus from "colyseus.js";
-import { Room } from "colyseus.js";
+//import { Room } from "colyseus.js";
 import { Chessboard } from "react-chessboard";
 import { ToastContainer, toast } from "react-toastify";
 import MoveHistory from "./MoveHistory";
 import "./App.css";
-import { ChessMove, PlayerNameInfo, RoomState } from "./types/ChessGameTypes";
+import {  PlayerNameInfo } from "./types/ChessGameTypes";
+import type {MyRoomState} from "../../server/src/rooms/schema/MyRoomState"
+import type PlayerMove from "../../server/src/rooms/schema/PlayerMove"
+
+import { ArraySchema  } from "@colyseus/schema";
 
 
 function ChessGame() {
   const [client] = useState(
     new Colyseus.Client(import.meta.env.VITE_SERVER_URL)
   );
-  const [room, setRoom] = useState<Room<unknown> | null>(null);
+  const [room, setRoom] = useState <Colyseus.Room<MyRoomState>>();
   const [error, setError] = useState("");
   const [fen, setFen] = useState("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
@@ -21,7 +25,7 @@ function ChessGame() {
   const [isWhite, setIsWhite] = useState(true); // True if this client plays as White
   const [turn, setTurn] = useState("white");
   const [playerColor, setPlayerColor] = useState("");
-  const [moves, setMoves] = useState<ChessMove[] | null >(null); 
+  const [moves, setMoves] = useState<ArraySchema<PlayerMove> | null >(null); 
   const [playerName, setPlayerName] = useState("");
   const [opponentName, setOpponentName] = useState("");
   const [gameOver, setGameOver] = useState(false);
@@ -71,13 +75,12 @@ function ChessGame() {
         console.log("error", message.message);
       });
 
-      room.onStateChange((state:unknown) => {
-        const typedState = state as RoomState;
-        console.log(room.name, "has new state:", typedState);
-        setFen(typedState.fen); 
-        setMoves(typedState.moves); 
-        setTurn(typedState.turn_of_player);
-        setPlayerCount(typedState.number_of_players);
+      room.onStateChange((state) => {
+        console.log(room.name, "has new state:", state);
+        setFen(state.fen); 
+        setMoves(state.moves); 
+        setTurn(state.turn_of_player);
+        setPlayerCount(state.number_of_players);
 
       }); 
 
@@ -117,7 +120,7 @@ function ChessGame() {
       return;
     }
     try {
-      const joinedRoom = await client.joinOrCreate("my_room", { playerName });
+      const joinedRoom = await client.joinOrCreate<MyRoomState>("my_room", { playerName });
       console.log(joinedRoom.sessionId, "joined", joinedRoom.name);
       setRoom(joinedRoom);
     } catch (e) {
