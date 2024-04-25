@@ -39,7 +39,7 @@ function ChessGame() {
       });
 
       room.onMessage("waiting_for_player", (message) => {
-        console.log(message);
+       // console.log(message);
         toast.info("Waiting for player..");
       });
 
