@@ -21,8 +21,12 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
+          cd server
+          npm install
+          npm run build
+          cd ..
           cd client
-          npm ci
+          npm install
           npm run build
 
       - name: Deploy 🚀

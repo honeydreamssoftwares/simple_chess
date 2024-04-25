@@ -12,6 +12,7 @@
     "gh-deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@colyseus/schema": "^2.0.31",
     "colyseus.js": "^0.15.18",
     "react": "^18.2.0",
     "react-chessboard": "^4.5.0",
