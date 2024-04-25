@@ -6,7 +6,6 @@ import { Chessboard } from "react-chessboard";
 import { ToastContainer, toast } from "react-toastify";
 import MoveHistory from "./MoveHistory";
 import "./App.css";
-import {  PlayerNameInfo } from "./types/ChessGameTypes";
 import type {MyRoomState} from "../../server/src/rooms/schema/MyRoomState"
 import type PlayerMove from "../../server/src/rooms/schema/PlayerMove"
 
@@ -27,7 +26,7 @@ function ChessGame() {
   const [playerColor, setPlayerColor] = useState("");
   const [moves, setMoves] = useState<ArraySchema<PlayerMove> | null >(null); 
   const [playerName, setPlayerName] = useState("");
-  const [opponentName, setOpponentName] = useState("");
+  const [opponentName, setOpponentName] = useState<string>("");
   const [gameOver, setGameOver] = useState(false);
   const [gameResult, setGameResult] = useState("");
 
@@ -82,6 +81,14 @@ function ChessGame() {
         setTurn(state.turn_of_player);
         setPlayerCount(state.number_of_players);
 
+        if(state.number_of_players===2){
+          state.players.forEach((details, sessionId) => {
+            if (sessionId !== room.sessionId) {
+                setOpponentName(details.name) ;
+            }
+        });
+        }
+
       }); 
 
 
@@ -101,14 +108,14 @@ function ChessGame() {
 
 
 
-      room.onMessage<PlayerNameInfo[]>("names_update", (message) => {
+      /* room.onMessage<PlayerNameInfo[]>("names_update", (message) => {
         console.log("names_update",message);
         message.forEach(n => {
           if (n.id !== room.sessionId) {  
             setOpponentName(n.name);
           }
         });
-      });
+      }); */
 
 
     }
