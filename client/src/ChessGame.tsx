@@ -80,6 +80,18 @@ function ChessGame() {
             setPlayerColor(details.color);
           }
         });
+
+        //Game over
+        if(state.is_game_running===false){
+          //Game is over now
+          setGameOver(true);
+          //Since draw has no winner
+          let winner="No One";
+          if(state.game_result_winner !== ""){
+            winner=state.game_result_winner;
+          }
+          setGameResult(state.game_result_status+"Winner:"+winner);
+        }
       });
     }
   }, [room]);
