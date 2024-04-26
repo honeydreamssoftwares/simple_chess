@@ -1,10 +1,10 @@
 import { Room, Client } from "@colyseus/core";
-import { MyRoomState } from "./schema/MyRoomState";
+import { ChessRoomState } from "./schema/ChessRoomState";
 import PlayerMove from "./schema/PlayerMove";
 import { Chess } from "chess.js";
 import { PlayerDetails } from "./schema/PlayerDetails";
 
-export class MyRoom extends Room<MyRoomState> {
+export class ChessGameRoom extends Room<ChessRoomState> {
   private chessGame: Chess;
   maxClients = 2;
   private moveTimeout: NodeJS.Timeout | null = null;
@@ -30,7 +30,7 @@ export class MyRoom extends Room<MyRoomState> {
   //Events
 
   onCreate(options: any) {
-    this.setState(new MyRoomState());
+    this.setState(new ChessRoomState());
     this.chessGame = new Chess();
 
     this.onMessage(
@@ -117,9 +117,10 @@ export class MyRoom extends Room<MyRoomState> {
     }
 
     if (gameResult.status) {
-      this.broadcast("game_over", gameResult);
-      this.state.fen = this.chessGame.fen();
-      this.broadcast("update_state", this.state);
+      //this.broadcast("game_over", gameResult);
+     // this.state.fen = this.chessGame.fen();
+      //this.broadcast("update_state", this.state);
+      this.state.is_game_running=false;
       this.disconnect();
     }
   }

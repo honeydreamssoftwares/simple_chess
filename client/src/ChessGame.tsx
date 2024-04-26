@@ -6,7 +6,9 @@ import { Chessboard } from "react-chessboard";
 import { ToastContainer, toast } from "react-toastify";
 import MoveHistory from "./MoveHistory";
 import "./App.css";
-import type { MyRoomState } from "../../server/src/rooms/schema/MyRoomState";
+
+//Import server states
+import type { ChessRoomState } from "../../server/src/rooms/schema/ChessRoomState"; 
 import type PlayerMove from "../../server/src/rooms/schema/PlayerMove";
 
 import { ArraySchema } from "@colyseus/schema";
@@ -15,7 +17,7 @@ function ChessGame() {
   const [client] = useState(
     new Colyseus.Client(import.meta.env.VITE_SERVER_URL)
   );
-  const [room, setRoom] = useState<Colyseus.Room<MyRoomState>>();
+  const [room, setRoom] = useState<Colyseus.Room<ChessRoomState>>();
   const [error, setError] = useState("");
   const [fen, setFen] = useState(
     "start"
@@ -88,7 +90,7 @@ function ChessGame() {
       return;
     }
     try {
-      const joinedRoom = await client.joinOrCreate<MyRoomState>("my_room", {
+      const joinedRoom = await client.joinOrCreate<ChessRoomState>("my_room", {
         playerName,
       });
       console.log(joinedRoom.sessionId, "joined", joinedRoom.name);
