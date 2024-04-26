@@ -1,10 +1,10 @@
 import { Room, Client } from "@colyseus/core";
-import { MyRoomState } from "./schema/MyRoomState";
+import { ChessRoomState } from "./schema/ChessRoomState";
 import PlayerMove from "./schema/PlayerMove";
 import { Chess } from "chess.js";
 import { PlayerDetails } from "./schema/PlayerDetails";
 
-export class ChessGameRoom extends Room<MyRoomState> {
+export class ChessGameRoom extends Room<ChessRoomState> {
   private chessGame: Chess;
   maxClients = 2;
   private moveTimeout: NodeJS.Timeout | null = null;
@@ -30,7 +30,7 @@ export class ChessGameRoom extends Room<MyRoomState> {
   //Events
 
   onCreate(options: any) {
-    this.setState(new MyRoomState());
+    this.setState(new ChessRoomState());
     this.chessGame = new Chess();
 
     this.onMessage(

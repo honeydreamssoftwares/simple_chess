@@ -2,7 +2,7 @@ import { Schema, type,ArraySchema ,MapSchema  } from "@colyseus/schema";
 import PlayerMove from "./PlayerMove";
 import { PlayerDetails } from "./PlayerDetails";
 
-export class MyRoomState extends Schema {
+export class ChessRoomState extends Schema {
 
   @type("string") turn_of_player: string = "white"; //White moves by default
   @type("number") number_of_players: number = 0;
