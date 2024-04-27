@@ -8,7 +8,7 @@ export class ChessGameRoom extends Room<ChessRoomState> {
   private chessGame: Chess;
   maxClients = 2;
   private moveTimeout: NodeJS.Timeout | null = null;
-  private timeOutMillisec = 1000;
+  private timeOutMillisec = 100000;
 
 
   areBothPlayersAvailable():boolean{

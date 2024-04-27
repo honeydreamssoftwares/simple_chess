@@ -57,12 +57,33 @@ function ChessGame() {
         console.log("error", message.message);
       });
 
+      room.state.listen("turn_of_player", (currentValue) => {
+        console.log(`current value is now ${currentValue}`);
+        setTurn(currentValue);
+    });
+
+    room.state.listen("number_of_players", (currentValue) => {
+      console.log(`current value is now ${currentValue}`);
+      setPlayerCount(currentValue);
+  });
+
+  room.state.listen("fen", (currentValue) => {
+    console.log(`current value is now ${currentValue}`);
+    setFen(currentValue);
+});
+
+room.state.listen("moves", (currentValue) => {
+  console.log(`current value is now ${currentValue}`);
+  setMoves(new ArraySchema<PlayerMove>(...currentValue));
+});
+
+
       room.onStateChange((state) => {
         console.log(room.name, "has new state:", state);
-        setFen(state.fen);
-        setMoves(new ArraySchema<PlayerMove>(...state.moves));
-        setTurn(state.turn_of_player);
-        setPlayerCount(state.number_of_players);
+       // setFen(state.fen);
+        //setMoves(new ArraySchema<PlayerMove>(...state.moves));
+        
+        //setPlayerCount(state.number_of_players);
 
         //Opponent name
         if (state.number_of_players === 2) {
