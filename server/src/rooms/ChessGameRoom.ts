@@ -8,7 +8,7 @@ export class ChessGameRoom extends Room<ChessRoomState> {
   private chessGame: Chess;
   maxClients = 2;
   private moveTimeout: NodeJS.Timeout | null = null;
-  private timeOutMillisec = 300000;
+  private timeOutMillisec = 100000;
 
 
   areBothPlayersAvailable():boolean{
@@ -78,20 +78,12 @@ export class ChessGameRoom extends Room<ChessRoomState> {
 
           // Set a timeout to enforce move timer
           this.moveTimeout = setTimeout(() => {
-            const gameResult = {
-              winner: "",
-              status: "",
-              fen: this.chessGame.fen(),
-            };
-            gameResult.status = "Draw";
-            gameResult.winner =
-              this.chessGame.turn() === "w" ? "Black" : "White";
-            this.broadcast("game_over", gameResult);
+      
+           console.log("processing time draw");
+            this.state.is_game_running=false;
+            this.state.game_result_status="Draw";
+            this.state.game_result_winner="";
 
-            this.broadcast(
-              "move_timeout",
-              "Player did not make a move in time."
-            );
           }, this.timeOutMillisec);
         } catch (error) {
           console.error("Error processing move:", error);
@@ -105,18 +97,22 @@ export class ChessGameRoom extends Room<ChessRoomState> {
     const gameResult = { winner: "", status: "", fen: this.chessGame.fen() };
 
     if (this.chessGame.isCheckmate()) {
-      gameResult.winner = this.chessGame.turn() === "w" ? "Black" : "White";
-      gameResult.status = "Checkmate";
+      //gameResult.winner = this.chessGame.turn() === "w" ? "Black" : "White";
+      //gameResult.status = "Checkmate";
+      this.state.game_result_status="Checkmate";
+      this.state.game_result_winner=this.chessGame.turn() === "w" ? "Black" : "White";;
     } else if (
       this.chessGame.isDraw() ||
       this.chessGame.isStalemate() ||
       this.chessGame.isThreefoldRepetition() ||
       this.chessGame.isInsufficientMaterial()
     ) {
-      gameResult.status = "Draw";
+      //gameResult.status = "Draw";
+      this.state.game_result_status="Draw";
+
     }
 
-    if (gameResult.status) {
+    if (this.state.game_result_status) {
       //this.broadcast("game_over", gameResult);
      // this.state.fen = this.chessGame.fen();
       //this.broadcast("update_state", this.state);

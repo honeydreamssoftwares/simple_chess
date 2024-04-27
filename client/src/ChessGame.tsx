@@ -8,7 +8,7 @@ import MoveHistory from "./MoveHistory";
 import "./App.css";
 
 //Import server states
-import type { ChessRoomState } from "../../server/src/rooms/schema/ChessRoomState"; 
+import type { ChessRoomState } from "../../server/src/rooms/schema/ChessRoomState";
 import type PlayerMove from "../../server/src/rooms/schema/PlayerMove";
 
 import { ArraySchema } from "@colyseus/schema";
@@ -19,9 +19,7 @@ function ChessGame() {
   );
   const [room, setRoom] = useState<Colyseus.Room<ChessRoomState>>();
   const [error, setError] = useState("");
-  const [fen, setFen] = useState(
-    "start"
-  );
+  const [fen, setFen] = useState("start");
 
   const [playerCount, setPlayerCount] = useState(0);
   const [isWhite, setIsWhite] = useState(true); // True if this client plays as White
@@ -45,11 +43,11 @@ function ChessGame() {
         toast.info("Waiting for player..");
       });
 
-      room.onMessage("game_over", (message) => {
+      /*       room.onMessage("game_over", (message) => {
         setGameOver(true);
         setGameResult(`${message.status} - Winner: ${message.winner}`);
         toast.info(`Game Over: ${message.status} - Winner: ${message.winner}`);
-      });
+      }); */
 
       room.onMessage("error", (message) => {
         toast.error(message.message);
@@ -57,30 +55,66 @@ function ChessGame() {
         console.log("error", message.message);
       });
 
-      room.onStateChange((state) => {
-        console.log(room.name, "has new state:", state);
-        setFen(state.fen);
-        setMoves(new ArraySchema<PlayerMove>(...state.moves));
-        setTurn(state.turn_of_player);
-        setPlayerCount(state.number_of_players);
+      room.state.listen("turn_of_player", (currentValue) => {
+        console.log(`current value is now ${currentValue}`);
+        setTurn(currentValue);
+      });
 
-        //Opponent name
-        if (state.number_of_players === 2) {
-          state.players.forEach((details, sessionId) => {
-            if (sessionId !== room.sessionId) {
-              setOpponentName(details.name);
-            }
-          });
-        }
+      room.state.listen("number_of_players", (currentValue) => {
+        console.log(`current value is now ${currentValue}`);
+        setPlayerCount(currentValue);
+      });
 
-        // Own colour
-        state.players.forEach((details, sessionId) => {
+      room.state.listen("fen", (currentValue) => {
+        console.log(`current value is now ${currentValue}`);
+        setFen(currentValue);
+      });
+
+      room.state.listen("moves", (currentValue) => {
+        console.log(`current value is now ${currentValue}`);
+        setMoves(new ArraySchema<PlayerMove>(...currentValue));
+      });
+
+      room.state.listen("number_of_players", (currentValue) => {
+        console.log(`current value is now ${currentValue}`);
+
+        //Self details
+        room.state.players.forEach((details, sessionId) => {
           if (sessionId === room.sessionId) {
             setIsWhite(details.color === "white");
             setPlayerColor(details.color);
           }
         });
+
+
+        //Opponent name
+        if (currentValue === 2) {
+          room.state.players.forEach((details, sessionId) => {
+            if (sessionId !== room.sessionId) {
+              setOpponentName(details.name);
+            }
+          });
+        }
       });
+
+      room.state.listen("is_game_running", (currentValue) => {
+        console.log(`current value is now ${currentValue}`);
+        //Game over
+        if (currentValue=== false) {
+          //Game is over now
+          setGameOver(true);
+          //Since draw has no winner
+          let winner = "No One";
+          if (room.state.game_result_winner !== "") {
+            winner = room.state.game_result_winner;
+          }
+          setGameResult(room.state.game_result_status + "  Winner:" + winner);
+        }
+      });
+
+
+
+
     }
   }, [room]);
 
@@ -90,9 +124,12 @@ function ChessGame() {
       return;
     }
     try {
-      const joinedRoom = await client.joinOrCreate<ChessRoomState>("my_room", {
-        playerName,
-      });
+      const joinedRoom = await client.joinOrCreate<ChessRoomState>(
+        "chess_room",
+        {
+          playerName,
+        }
+      );
       console.log(joinedRoom.sessionId, "joined", joinedRoom.name);
       setRoom(joinedRoom);
     } catch (e) {
