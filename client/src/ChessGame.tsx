@@ -45,11 +45,11 @@ function ChessGame() {
         toast.info("Waiting for player..");
       });
 
-      room.onMessage("game_over", (message) => {
+/*       room.onMessage("game_over", (message) => {
         setGameOver(true);
         setGameResult(`${message.status} - Winner: ${message.winner}`);
         toast.info(`Game Over: ${message.status} - Winner: ${message.winner}`);
-      });
+      }); */
 
       room.onMessage("error", (message) => {
         toast.error(message.message);
@@ -90,7 +90,7 @@ function ChessGame() {
           if(state.game_result_winner !== ""){
             winner=state.game_result_winner;
           }
-          setGameResult(state.game_result_status+"Winner:"+winner);
+          setGameResult(state.game_result_status+"  Winner:"+winner);
         }
       });
     }
