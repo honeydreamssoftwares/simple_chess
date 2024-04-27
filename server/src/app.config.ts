@@ -13,7 +13,7 @@ export default config({
         /**
          * Define your room handlers:
          */
-        gameServer.define('my_room', ChessGameRoom);
+        gameServer.define('chess_room', ChessGameRoom);
 
     },
 

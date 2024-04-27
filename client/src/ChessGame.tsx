@@ -102,7 +102,7 @@ function ChessGame() {
       return;
     }
     try {
-      const joinedRoom = await client.joinOrCreate<ChessRoomState>("my_room", {
+      const joinedRoom = await client.joinOrCreate<ChessRoomState>("chess_room", {
         playerName,
       });
       console.log(joinedRoom.sessionId, "joined", joinedRoom.name);

@@ -78,25 +78,12 @@ export class ChessGameRoom extends Room<ChessRoomState> {
 
           // Set a timeout to enforce move timer
           this.moveTimeout = setTimeout(() => {
-       /*      const gameResult = {
-              winner: "",
-              status: "",
-              fen: this.chessGame.fen(),
-            };
-            gameResult.status = "Draw";
-            gameResult.winner =
-              this.chessGame.turn() === "w" ? "Black" : "White"; */
-           // this.broadcast("game_over", gameResult);
+      
            console.log("processing time draw");
             this.state.is_game_running=false;
             this.state.game_result_status="Draw";
             this.state.game_result_winner="";
-            //this.disconnect();
 
-           /*  this.broadcast(
-              "move_timeout",
-              "Player did not make a move in time."
-            ); */
           }, this.timeOutMillisec);
         } catch (error) {
           console.error("Error processing move:", error);
