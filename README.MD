@@ -102,10 +102,3 @@ Contributions to this project are welcome! Please create an issue or open a pull
 
 This project is unlicensed and free for use.
 
-## Bugs and Issues
-
-Please report any bugs or issues you find on the GitHub issues page: [GitHub Issues](https://github.com/colyseus/create-colyseus/issues).
-
-## More Information
-
-For more details, you can visit the [project homepage](https://github.com/colyseus/create-colyseus#readme).
