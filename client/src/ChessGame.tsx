@@ -88,7 +88,6 @@ function ChessGame() {
           }
         });
 
-
         //Opponent name
         if (currentValue === 2) {
           room.state.players.forEach((details, sessionId) => {
@@ -102,7 +101,7 @@ function ChessGame() {
       room.state.listen("is_game_running", (currentValue) => {
         console.log(`current value is now ${currentValue}`);
         //Game over
-        if (currentValue=== false) {
+        if (currentValue === false) {
           //Game is over now
           setGameOver(true);
           //Since draw has no winner
@@ -113,10 +112,6 @@ function ChessGame() {
           setGameResult(room.state.game_result_status + "  Winner:" + winner);
         }
       });
-
-
-
-
     }
   }, [room]);
 
@@ -195,45 +190,54 @@ function ChessGame() {
   );
 
   const roomBlock = () => (
-    <div className="flex flex-row justify-center items-start space-x-8">
-      <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg">
+    <div className="columns-lg space-x-8">
+      <div className="columns-xs	 bg-white p-6 rounded-lg shadow-lg">
         <div>Room ID: {room?.id}</div>
         {isPlayerAlone() ? (
-<><p>Waiting for an opponent...</p> <InviteBotButton roomId={room.id} /></>
-
+          <>
+            <p>Waiting for an opponent...</p>{" "}
+            <InviteBotButton roomId={room.id} />
+          </>
         ) : (
           mainGameAreaBlock()
         )}
       </div>
-      <div className="w-64">
+      <div className="columns-xs	">
         <MoveHistory moves={moves} />
       </div>
     </div>
   );
 
   const playerEntryBlock = () => (
-    <div className="space-y-4">
-      <input
-        className="border border-gray-300 p-2 w-full rounded"
-        value={playerName}
-        onChange={(e) => setPlayerName(e.target.value)}
-        placeholder="Enter your name"
-      />
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={connectToRoom}
-      >
-        Play now
-      </button>
+    <div className="space-y-4 flex flex-col justify-center items-center content-center	 ">
+      <div className="flex flex-row">
+        <input
+          className="border border-gray-300 p-2 w-full rounded"
+          value={playerName}
+          onChange={(e) => setPlayerName(e.target.value)}
+          placeholder="Choose your nick name"
+        />
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={connectToRoom}
+        >
+          Start
+        </button>
+      </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center items-center">
-      <h1 className="text-3xl font-bold text-center mb-12">
-        Simple Multiplayer Chess
-      </h1>
-      <div className="w-full max-w-md">
+    <div className="container mx-auto font-serif	">
+      <div className="flex flex-col items-center p-4">
+        <h1 className="text-3xl font-bold text-center p-4" >
+          Simple Multiplayer Chess
+        </h1>
+        <p>- Play with random people</p>
+        <p>- Play with a Bot</p>
+
+      </div>
+      <div className="">
         {errorBlock()}
         {room ? roomBlock() : playerEntryBlock()}
       </div>
