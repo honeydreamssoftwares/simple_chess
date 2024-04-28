@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
+import { Chess, Square } from "chess.js";
 import * as Colyseus from "colyseus.js";
 //import { Room } from "colyseus.js";
 import { Chessboard } from "react-chessboard";
@@ -20,7 +21,7 @@ function ChessGame() {
   );
   const [room, setRoom] = useState<Colyseus.Room<ChessRoomState>>();
   const [error, setError] = useState("");
-  const [fen, setFen] = useState("start");
+  const [game, setGame] = useState(new Chess());
 
   const [playerCount, setPlayerCount] = useState(0);
   const [isWhite, setIsWhite] = useState(true); // True if this client plays as White
@@ -44,12 +45,6 @@ function ChessGame() {
         toast.info("Waiting for player..");
       });
 
-      /*       room.onMessage("game_over", (message) => {
-        setGameOver(true);
-        setGameResult(`${message.status} - Winner: ${message.winner}`);
-        toast.info(`Game Over: ${message.status} - Winner: ${message.winner}`);
-      }); */
-
       room.onMessage("error", (message) => {
         toast.error(message.message);
 
@@ -69,7 +64,7 @@ function ChessGame() {
 
       room.state.listen("fen", (currentValue) => {
         console.log(`current value is now ${currentValue}`);
-        setFen(currentValue);
+        setGame(new Chess(currentValue));
       });
 
       room.state.moves.onAdd((currentValue) => {
@@ -135,18 +130,41 @@ function ChessGame() {
       toast.error("Failed to connect: " + (e as Error).message);
     }
   };
+  
 
-  const onPieceDrop = (sourceSquare: string, targetSquare: string) => {
+  function onPieceDropCallback(sourceSquare: Square, targetSquare: Square) {
     console.log(`Piece moved from ${sourceSquare} to ${targetSquare}`);
-    if (room) {
-      room.send("player_move", {
-        from: sourceSquare,
-        to: targetSquare,
-      });
-    }
+    try {
+      
+     
 
-    return true;
-  };
+      if (room) {
+        //Send the move change to server
+        room.send("player_move", {
+          from: sourceSquare,
+          to: targetSquare,
+        });
+
+        game.move({
+          from: sourceSquare,
+          to: targetSquare,
+          promotion: "q",
+        });
+  
+        const newGame = new Chess(game.fen());
+  
+        setGame(newGame);
+        console.log("setting game state")
+      }
+
+      return true;
+    } catch (e) {
+    //  toast.error((e as Error).message);
+
+      console.log(e);
+      return false;
+    }
+  }
 
   const isPlayerAlone = () => {
     return playerCount < 2 ? true : false;
@@ -174,6 +192,8 @@ function ChessGame() {
 
   const mainGameAreaBlock = () => (
     <>
+         { console.log("rendering... state")}
+
       {whosTurnBlock()}
       {versesBlock()}
       <p className="mb-4">
@@ -182,8 +202,8 @@ function ChessGame() {
       {!gameOver && (
         <Chessboard
           boardOrientation={isWhite ? "white" : "black"}
-          position={fen}
-          onPieceDrop={onPieceDrop}
+          position={game.fen()}
+          onPieceDrop={onPieceDropCallback}
         />
       )}
     </>
@@ -230,12 +250,11 @@ function ChessGame() {
   return (
     <div className="container mx-auto font-serif	">
       <div className="flex flex-col items-center p-4">
-        <h1 className="text-3xl font-bold text-center p-4" >
-        ♞Simple Mu♟︎tiplayer Chess
+        <h1 className="text-3xl font-bold text-center p-4">
+          ♞Simple Mu♟︎tiplayer Chess
         </h1>
         <p>- Play with random people</p>
         <p>- Play with a Bot</p>
-
       </div>
       <div className="">
         {errorBlock()}
