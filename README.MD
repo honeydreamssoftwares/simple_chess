@@ -55,7 +55,7 @@ cd client
 npm run dev
 ```
 
-This will start the Vite development server, and you should be able to access the application via `http://localhost:3000`.
+This will start the Vite development server, and you should be able to access the application via `http://localhost:5173`.
 
 ### Server
 
@@ -66,9 +66,9 @@ cd server
 npm start
 ```
 
-This will compile the TypeScript files and start the Colyseus server.
+This will compile the TypeScript files and start the Colyseus server on `http://localhost:2567`
 
-## Building for Production
+## Building for Production 
 
 ### Client
 
