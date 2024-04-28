@@ -192,7 +192,7 @@ function ChessGame() {
   const roomBlock = () => (
     <div className="columns-lg space-x-8">
       <div className="columns-xs	 bg-white p-6 rounded-lg shadow-lg">
-        <div>Room ID: {room?.id}</div>
+        <div className="">Room ID: {room?.id}</div>
         {isPlayerAlone() ? (
           <>
             <p>Waiting for an opponent...</p>{" "}
@@ -221,7 +221,7 @@ function ChessGame() {
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={connectToRoom}
         >
-          Start
+          Start♔
         </button>
       </div>
     </div>
@@ -231,7 +231,7 @@ function ChessGame() {
     <div className="container mx-auto font-serif	">
       <div className="flex flex-col items-center p-4">
         <h1 className="text-3xl font-bold text-center p-4" >
-          Simple Multiplayer Chess
+        ♞Simple Mu♟︎tiplayer Chess
         </h1>
         <p>- Play with random people</p>
         <p>- Play with a Bot</p>
