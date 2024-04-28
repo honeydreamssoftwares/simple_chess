@@ -14,6 +14,7 @@ import type PlayerMove from "../../server/src/rooms/schema/PlayerMove";
 
 import { ArraySchema } from "@colyseus/schema";
 import InviteBotButton from "./InviteBotButton";
+import { EndGameButton } from "./EndGameButton";
 
 function ChessGame() {
   const [client] = useState(
@@ -224,6 +225,7 @@ function ChessGame() {
       </div>
       <div className="columns-xs	">
         <MoveHistory moves={moves} />
+        <EndGameButton room={room}></EndGameButton>
       </div>
     </div>
   );

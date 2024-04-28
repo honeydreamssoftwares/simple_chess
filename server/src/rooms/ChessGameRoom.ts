@@ -10,28 +10,31 @@ export class ChessGameRoom extends Room<ChessRoomState> {
   private moveTimeout: NodeJS.Timeout | null = null;
   private timeOutMillisec = 100000;
 
-
-  areBothPlayersAvailable():boolean{
+  areBothPlayersAvailable(): boolean {
     return this.clients.length === 2;
   }
 
-  currentNumberOfPlayers():number{
+  currentNumberOfPlayers(): number {
     return this.clients.length;
   }
 
-  getAllPayersDetails(){
-  return this.clients.map((c) => ({
-    id: c.sessionId,
-    name: this.state.players.get(c.sessionId).name,
-  }));
+  getAllPayersDetails() {
+    return this.clients.map((c) => ({
+      id: c.sessionId,
+      name: this.state.players.get(c.sessionId).name,
+    }));
   }
-
 
   //Events
 
   onCreate(options: any) {
     this.setState(new ChessRoomState());
     this.chessGame = new Chess();
+
+    this.onMessage("destroy_room", (client, message) => {
+      console.log("Room is being destroyed by the creator.");
+      this.disconnect(); 
+    });
 
     this.onMessage(
       "player_move",
@@ -54,11 +57,11 @@ export class ChessGameRoom extends Room<ChessRoomState> {
           }
 
           //Attemt to move peice
-          const move = this.chessGame.move({ 
-            from: data.from, 
+          const move = this.chessGame.move({
+            from: data.from,
             to: data.to,
-            promotion: 'q'
-           });
+            promotion: "q",
+          });
 
           if (move === null) {
             console.log("Illegal move attempted by", client.sessionId);
@@ -77,18 +80,17 @@ export class ChessGameRoom extends Room<ChessRoomState> {
           playerMove.to = data.to;
           playerMove.san = move.san;
           //Save list of moves
-          
+
           this.state.moves.push(playerMove);
-          this.state.turn_of_player=this.chessGame.turn() === "w" ? "white" : "black";
+          this.state.turn_of_player =
+            this.chessGame.turn() === "w" ? "white" : "black";
 
           // Set a timeout to enforce move timer
           this.moveTimeout = setTimeout(() => {
-      
-           console.log("processing time draw");
-            this.state.is_game_running=false;
-            this.state.game_result_status="Draw";
-            this.state.game_result_winner="";
-
+            console.log("processing time draw");
+            this.state.is_game_running = false;
+            this.state.game_result_status = "Draw";
+            this.state.game_result_winner = "";
           }, this.timeOutMillisec);
         } catch (error) {
           console.error("Error processing move:", error);
@@ -102,37 +104,33 @@ export class ChessGameRoom extends Room<ChessRoomState> {
     const gameResult = { winner: "", status: "", fen: this.chessGame.fen() };
 
     if (this.chessGame.isCheckmate()) {
-      
-      this.state.game_result_status="Checkmate";
-      this.state.game_result_winner=this.chessGame.turn() === "w" ? "Black" : "White";;
+      this.state.game_result_status = "Checkmate";
+      this.state.game_result_winner =
+        this.chessGame.turn() === "w" ? "Black" : "White";
     } else if (
       this.chessGame.isDraw() ||
       this.chessGame.isStalemate() ||
       this.chessGame.isThreefoldRepetition() ||
       this.chessGame.isInsufficientMaterial()
     ) {
-      this.state.game_result_status="Draw";
-
+      this.state.game_result_status = "Draw";
     }
 
     if (this.state.game_result_status) {
-      
-      this.state.is_game_running=false;
+      this.state.is_game_running = false;
       //this.disconnect();
     }
   }
   onJoin(client: Client, options: { playerName: string }) {
     console.log(client.sessionId, "joined with name:", options.playerName);
 
-
     const playerDetails = new PlayerDetails();
-    playerDetails.color = this.currentNumberOfPlayers() === 1 ? "white" : "black";
+    playerDetails.color =
+      this.currentNumberOfPlayers() === 1 ? "white" : "black";
     playerDetails.name = options.playerName;
     //Save state
     this.state.players.set(client.sessionId, playerDetails);
-    this.state.number_of_players=this.currentNumberOfPlayers();
-
-   
+    this.state.number_of_players = this.currentNumberOfPlayers();
   }
 
   onLeave(client: Client, consented: boolean) {
@@ -144,9 +142,8 @@ export class ChessGameRoom extends Room<ChessRoomState> {
       );
     }
 
-    this.state.number_of_players=this.currentNumberOfPlayers();
-
- }
+    this.state.number_of_players = this.currentNumberOfPlayers();
+  }
   onDispose() {
     console.log("room", this.roomId, "disposing...");
   }
