@@ -7,7 +7,6 @@ import { playground } from "@colyseus/playground";
  */
 import { ChessGameRoom } from "./rooms/ChessGameRoom";
 import { BotClient } from "./bots/botClient";
-import { ChessRoomState } from "./rooms/schema/ChessRoomState";
 
 
 
