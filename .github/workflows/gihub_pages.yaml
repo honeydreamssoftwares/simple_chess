@@ -17,6 +17,8 @@ jobs:
     environment: production
     env:
         VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+        VITE_BOT_URL: ${{ secrets.VITE_BOT_URL }}
+
 
     steps:
       - name: Checkout 🛎️
