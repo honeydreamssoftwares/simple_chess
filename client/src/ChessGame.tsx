@@ -277,6 +277,10 @@ function ChessGame() {
         {errorBlock()}
         {room ? roomBlock() : playerEntryBlock()}
       </div>
+      <div className="flex flex-col items-center p-4">
+
+      <p><a className="underline" target="_blank" href="https://github.com/honeydreamssoftwares/simple_chess/issues">Report Issues or Contribute</a></p>
+      </div>
       <ToastContainer
         position="top-right"
         autoClose={5000}
