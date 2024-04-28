@@ -14,6 +14,7 @@ import type PlayerMove from "../../server/src/rooms/schema/PlayerMove";
 
 import { ArraySchema } from "@colyseus/schema";
 import InviteBotButton from "./InviteBotButton";
+import { EndGameButton } from "./EndGameButton";
 
 function ChessGame() {
   const [client] = useState(
@@ -32,6 +33,8 @@ function ChessGame() {
   const [opponentName, setOpponentName] = useState<string>("");
   const [gameOver, setGameOver] = useState(false);
   const [gameResult, setGameResult] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     if (room) {
@@ -40,9 +43,16 @@ function ChessGame() {
         toast.info("Game Started..");
       });
 
-      room.onMessage("waiting_for_player", (message) => {
+      room.onMessage("player_left", (message) => {
         console.log(message);
-        toast.info("Waiting for player..");
+ 
+      });
+
+      room.onLeave(() => {
+        console.log(room.sessionId, "left", room.name);
+        toast.info("Game Over..");
+        setGameOver(true);
+        setRoom(null);
       });
 
       room.onMessage("error", (message) => {
@@ -115,6 +125,7 @@ function ChessGame() {
       toast.error("Please enter your name before joining.");
       return;
     }
+    setIsLoading(true); 
     try {
       const joinedRoom = await client.joinOrCreate<ChessRoomState>(
         "chess_room",
@@ -124,10 +135,14 @@ function ChessGame() {
       );
       console.log(joinedRoom.sessionId, "joined", joinedRoom.name);
       setRoom(joinedRoom);
+      setIsLoading(false); 
+
     } catch (e) {
       console.error("JOIN ERROR", e);
       setError("Failed to connect: " + (e as Error).message);
       toast.error("Failed to connect: " + (e as Error).message);
+      setIsLoading(false); 
+
     }
   };
   
@@ -198,6 +213,8 @@ function ChessGame() {
       {versesBlock()}
       <p className="mb-4">
         {gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}
+       {!gameOver && <EndGameButton room={room}></EndGameButton>}
+
       </p>
       {!gameOver && (
         <Chessboard
@@ -222,7 +239,7 @@ function ChessGame() {
           mainGameAreaBlock()
         )}
       </div>
-      <div className="columns-xs	">
+      <div className="">
         <MoveHistory moves={moves} />
       </div>
     </div>
@@ -242,7 +259,7 @@ function ChessGame() {
           onClick={connectToRoom}
         >
           Start♔
-        </button>
+        </button>{isLoading && "Please wait...."}
       </div>
     </div>
   );
