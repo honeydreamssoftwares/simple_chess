@@ -54,7 +54,11 @@ export class ChessGameRoom extends Room<ChessRoomState> {
           }
 
           //Attemt to move peice
-          const move = this.chessGame.move({ from: data.from, to: data.to });
+          const move = this.chessGame.move({ 
+            from: data.from, 
+            to: data.to,
+            promotion: 'q'
+           });
 
           if (move === null) {
             console.log("Illegal move attempted by", client.sessionId);
@@ -73,6 +77,7 @@ export class ChessGameRoom extends Room<ChessRoomState> {
           playerMove.to = data.to;
           playerMove.san = move.san;
           //Save list of moves
+          
           this.state.moves.push(playerMove);
           this.state.turn_of_player=this.chessGame.turn() === "w" ? "white" : "black";
 
@@ -113,7 +118,7 @@ export class ChessGameRoom extends Room<ChessRoomState> {
     if (this.state.game_result_status) {
       
       this.state.is_game_running=false;
-      this.disconnect();
+      //this.disconnect();
     }
   }
   onJoin(client: Client, options: { playerName: string }) {

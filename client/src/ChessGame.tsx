@@ -58,6 +58,7 @@ function ChessGame() {
 
       room.state.listen("turn_of_player", (currentValue) => {
         console.log(`current value is now ${currentValue}`);
+        console.log(room.state);
         setTurn(currentValue);
       });
 
@@ -71,9 +72,9 @@ function ChessGame() {
         setFen(currentValue);
       });
 
-      room.state.listen("moves", (currentValue) => {
-        console.log(`current value is now ${currentValue}`);
-        setMoves(new ArraySchema<PlayerMove>(...currentValue));
+      room.state.moves.onAdd((currentValue) => {
+        console.log(`Moves current value is now ${currentValue}`);
+        setMoves(new ArraySchema<PlayerMove>(...room.state.moves));
       });
 
       room.state.listen("number_of_players", (currentValue) => {
