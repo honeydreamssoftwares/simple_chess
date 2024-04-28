@@ -3,32 +3,21 @@ import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
 
 /**
- * Import your Room files
+ * Import  Room files
  */
 import { ChessGameRoom } from "./rooms/ChessGameRoom";
 import { BotClient } from "./bots/botClient";
 import { ChessRoomState } from "./rooms/schema/ChessRoomState";
 
 
-const roomsById = new Map();
 
 export default config({
 
     initializeGameServer: (gameServer) => {
         /**
-         * Define your room handlers:
+         * Define  room handlers:
          */
-        gameServer.define('chess_room', ChessGameRoom).on("create", (room:ChessGameRoom) => {
-            // When a room is created, add it to the map
-            roomsById.set(room.roomId, room);
-            return room;
-           // room.onDispose();
-        });
-
-            gameServer.onShutdown(() => {
-                console.log("Server is shutting down.");
-                roomsById.clear();
-            });
+        gameServer.define('chess_room', ChessGameRoom);
 
     },
 
@@ -37,26 +26,24 @@ export default config({
          * Bind your custom express routes here:
          * Read more: https://expressjs.com/en/starter/basic-routing.html
          */
-        app.get("/hello_world", (req, res) => {
-            res.send("Hello deploy");
-        });
+
 
         app.post('/add-bot/:roomId', async (req, res) => {
             try {
                 const roomId = req.params.roomId;
-                const room = roomsById.get(roomId);                ;
-                if (room) {
+                
                     const bot = new BotClient();
-                    await bot.joinRoom(room);
+                    await bot.joinRoom(roomId);
                     res.send({ success: true, message: 'Bot added successfully.' });
-                } else {
-                    res.status(404).send({ success: false, message: 'Room not found.' });
-                }
+            
             } catch (error) {
 
-                console.log(error);
+                console.log(error as Error);
 
-                //res.status(500).send({ success: false, message: error.message });
+                if (error instanceof Error) {
+
+                res.status(500).send({ success: false, message: error.message });
+                }
             }
         });
 

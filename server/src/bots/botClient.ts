@@ -12,8 +12,8 @@ export class BotClient {
 
     }
 
-    async joinRoom(room:Room<ChessRoomState>) {
-        this.room = await this.client.joinById(room.roomId,{playerName:"Chess Bot"});
+    async joinRoom(roomId:string) {
+        this.room = await this.client.joinById(roomId,{playerName:"Chess Bot"});
         console.log(`Bot has joined the room: ${this.room.roomId}`);
 
         // Set up a generic handler for all messages (if needed)
