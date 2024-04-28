@@ -7,6 +7,7 @@ import { playground } from "@colyseus/playground";
  */
 import { ChessGameRoom } from "./rooms/ChessGameRoom";
 import { BotClient } from "./bots/botClient";
+import { ChessRoomState } from "./rooms/schema/ChessRoomState";
 
 
 const roomsById = new Map();
@@ -17,13 +18,11 @@ export default config({
         /**
          * Define your room handlers:
          */
-        gameServer.define('chess_room', ChessGameRoom).on("create", (room) => {
+        gameServer.define('chess_room', ChessGameRoom).on("create", (room:ChessGameRoom) => {
             // When a room is created, add it to the map
             roomsById.set(room.roomId, room);
-            room.on("dispose", () => {
-                // Remove the room from the map when it is disposed
-                roomsById.delete(room.roomId);
-            });
+            return room;
+           // room.onDispose();
         });
 
             gameServer.onShutdown(() => {
@@ -54,6 +53,8 @@ export default config({
                     res.status(404).send({ success: false, message: 'Room not found.' });
                 }
             } catch (error) {
+
+                console.log(error);
 
                 //res.status(500).send({ success: false, message: error.message });
             }
