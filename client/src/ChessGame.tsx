@@ -33,6 +33,8 @@ function ChessGame() {
   const [opponentName, setOpponentName] = useState<string>("");
   const [gameOver, setGameOver] = useState(false);
   const [gameResult, setGameResult] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     if (room) {
@@ -123,6 +125,7 @@ function ChessGame() {
       toast.error("Please enter your name before joining.");
       return;
     }
+    setIsLoading(true); 
     try {
       const joinedRoom = await client.joinOrCreate<ChessRoomState>(
         "chess_room",
@@ -132,10 +135,14 @@ function ChessGame() {
       );
       console.log(joinedRoom.sessionId, "joined", joinedRoom.name);
       setRoom(joinedRoom);
+      setIsLoading(false); 
+
     } catch (e) {
       console.error("JOIN ERROR", e);
       setError("Failed to connect: " + (e as Error).message);
       toast.error("Failed to connect: " + (e as Error).message);
+      setIsLoading(false); 
+
     }
   };
   
@@ -252,7 +259,7 @@ function ChessGame() {
           onClick={connectToRoom}
         >
           Start♔
-        </button>
+        </button>{isLoading && "Please wait...."}
       </div>
     </div>
   );
