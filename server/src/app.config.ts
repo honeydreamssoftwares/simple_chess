@@ -6,6 +6,10 @@ import { playground } from "@colyseus/playground";
  * Import your Room files
  */
 import { ChessGameRoom } from "./rooms/ChessGameRoom";
+import { BotClient } from "./bots/botClient";
+
+
+const roomsById = new Map();
 
 export default config({
 
@@ -13,7 +17,19 @@ export default config({
         /**
          * Define your room handlers:
          */
-        gameServer.define('chess_room', ChessGameRoom);
+        gameServer.define('chess_room', ChessGameRoom).on("create", (room) => {
+            // When a room is created, add it to the map
+            roomsById.set(room.roomId, room);
+            room.on("dispose", () => {
+                // Remove the room from the map when it is disposed
+                roomsById.delete(room.roomId);
+            });
+        });
+
+            gameServer.onShutdown(() => {
+                console.log("Server is shutting down.");
+                roomsById.clear();
+            });
 
     },
 
@@ -24,6 +40,23 @@ export default config({
          */
         app.get("/hello_world", (req, res) => {
             res.send("Hello deploy");
+        });
+
+        app.post('/add-bot/:roomId', async (req, res) => {
+            try {
+                const roomId = req.params.roomId;
+                const room = roomsById.get(roomId);                ;
+                if (room) {
+                    const bot = new BotClient();
+                    await bot.joinRoom(room);
+                    res.send({ success: true, message: 'Bot added successfully.' });
+                } else {
+                    res.status(404).send({ success: false, message: 'Room not found.' });
+                }
+            } catch (error) {
+
+                //res.status(500).send({ success: false, message: error.message });
+            }
         });
 
       
