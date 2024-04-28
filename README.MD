@@ -1,5 +1,7 @@
 # Simple Chess Application
 
+![Logo](simple-chess-logo.png?raw=true "Simple Chess Logo")
+
 This project consists of a client and a server for a chess application using React for the frontend and Colyseus for the multiplayer server functionality.
 
 ## Structure
