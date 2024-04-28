@@ -41,9 +41,16 @@ function ChessGame() {
         toast.info("Game Started..");
       });
 
-      room.onMessage("waiting_for_player", (message) => {
+      room.onMessage("player_left", (message) => {
         console.log(message);
-        toast.info("Waiting for player..");
+ 
+      });
+
+      room.onLeave(() => {
+        console.log(room.sessionId, "left", room.name);
+        toast.info("Game Over..");
+        setGameOver(true);
+        setRoom(null);
       });
 
       room.onMessage("error", (message) => {
@@ -199,6 +206,8 @@ function ChessGame() {
       {versesBlock()}
       <p className="mb-4">
         {gameOver ? `Game Over: ${gameResult}` : "Game is ongoing"}
+       {!gameOver && <EndGameButton room={room}></EndGameButton>}
+
       </p>
       {!gameOver && (
         <Chessboard
@@ -223,9 +232,8 @@ function ChessGame() {
           mainGameAreaBlock()
         )}
       </div>
-      <div className="columns-xs	">
+      <div className="">
         <MoveHistory moves={moves} />
-        <EndGameButton room={room}></EndGameButton>
       </div>
     </div>
   );

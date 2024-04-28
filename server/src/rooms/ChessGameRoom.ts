@@ -135,14 +135,13 @@ export class ChessGameRoom extends Room<ChessRoomState> {
 
   onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, "left!");
-    if (this.clients.length < 2) {
       this.broadcast(
-        "waiting_for_player",
-        "Waiting for another player to join."
+        "player_left",
+        "Player Left"
       );
-    }
 
-    this.state.number_of_players = this.currentNumberOfPlayers();
+
+   // this.state.number_of_players = this.currentNumberOfPlayers();
   }
   onDispose() {
     console.log("room", this.roomId, "disposing...");
