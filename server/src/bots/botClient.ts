@@ -13,7 +13,7 @@ export class BotClient {
     }
 
     async joinRoom(room:Room<ChessRoomState>) {
-        this.room = await this.client.joinById(room.roomId);
+        this.room = await this.client.joinById(room.roomId,{playerName:"Chess Bot"});
         console.log(`Bot has joined the room: ${this.room.roomId}`);
 
         // Set up a generic handler for all messages (if needed)
@@ -35,15 +35,27 @@ export class BotClient {
     }
 
     makeMove() {
-        const moves = this.chess.moves();
-        if (moves.length > 0 && this.chess.turn() === 'b') {  // Assuming bot plays as black
-            const move = moves[Math.floor(Math.random() * moves.length)];
-            this.chess.move(move);
-            this.room.send('player_move', {
-                from: move.slice(0, 2),
-                to: move.slice(2, 4),
-                promotion: 'q'  // Assume promotion to queen
-            });
+        const moves = this.chess.moves({ verbose: true });
+        console.log("Available moves:", moves);
+        if (moves.length > 0 && this.chess.turn() === 'b') {  // Assuming the bot plays as black
+            const validMoves = moves.filter(m => m.to); // Filter out any moves where 'to' is falsy, assuming falsy values are invalid
+            if (validMoves.length > 0) {
+                const move = validMoves[Math.floor(Math.random() * validMoves.length)];
+                this.chess.move({ from: move.from, to: move.to, promotion: 'q' }); // Execute the move
+                console.log(`Bot moved from ${move.from} to ${move.to}`);
+    
+                // Send the move to the Colyseus server
+                this.room.send('player_move', {
+                    from: move.from,
+                    to: move.to,
+                    promotion: 'q'  // Assume promotion to queen for simplicity
+                });
+            } else {
+                console.error("No valid moves available");
+            }
         }
     }
+    
+    
+    
 }
