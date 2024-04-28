@@ -97,8 +97,7 @@ export class ChessGameRoom extends Room<ChessRoomState> {
     const gameResult = { winner: "", status: "", fen: this.chessGame.fen() };
 
     if (this.chessGame.isCheckmate()) {
-      //gameResult.winner = this.chessGame.turn() === "w" ? "Black" : "White";
-      //gameResult.status = "Checkmate";
+      
       this.state.game_result_status="Checkmate";
       this.state.game_result_winner=this.chessGame.turn() === "w" ? "Black" : "White";;
     } else if (
@@ -107,15 +106,12 @@ export class ChessGameRoom extends Room<ChessRoomState> {
       this.chessGame.isThreefoldRepetition() ||
       this.chessGame.isInsufficientMaterial()
     ) {
-      //gameResult.status = "Draw";
       this.state.game_result_status="Draw";
 
     }
 
     if (this.state.game_result_status) {
-      //this.broadcast("game_over", gameResult);
-     // this.state.fen = this.chessGame.fen();
-      //this.broadcast("update_state", this.state);
+      
       this.state.is_game_running=false;
       this.disconnect();
     }
@@ -131,19 +127,7 @@ export class ChessGameRoom extends Room<ChessRoomState> {
     this.state.players.set(client.sessionId, playerDetails);
     this.state.number_of_players=this.currentNumberOfPlayers();
 
-    //client.send("color_assignment", { color: playerDetails.color  });
    
-
-    //Every time a player joins inform both of the number of players
-/*     this.broadcast("player_joined", {
-      numberOfPlayers: this.currentNumberOfPlayers(),
-    }); */
-
-/*     if (this.areBothPlayersAvailable()) {
-      const names = this.getAllPayersDetails();
-      console.log("names_update", names);
-      this.broadcast("names_update", names);
-    } */
   }
 
   onLeave(client: Client, consented: boolean) {
@@ -157,12 +141,7 @@ export class ChessGameRoom extends Room<ChessRoomState> {
 
     this.state.number_of_players=this.currentNumberOfPlayers();
 
-
-/*     this.broadcast("player_left", {
-      sessionId: client.sessionId,
-      numberOfPlayers: this.clients.length - 1,
-    }); */
-  }
+ }
   onDispose() {
     console.log("room", this.roomId, "disposing...");
   }

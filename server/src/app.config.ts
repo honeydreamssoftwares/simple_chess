@@ -3,15 +3,18 @@ import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
 
 /**
- * Import your Room files
+ * Import  Room files
  */
 import { ChessGameRoom } from "./rooms/ChessGameRoom";
+import { BotClient } from "./bots/botClient";
+
+
 
 export default config({
 
     initializeGameServer: (gameServer) => {
         /**
-         * Define your room handlers:
+         * Define  room handlers:
          */
         gameServer.define('chess_room', ChessGameRoom);
 
@@ -22,8 +25,25 @@ export default config({
          * Bind your custom express routes here:
          * Read more: https://expressjs.com/en/starter/basic-routing.html
          */
-        app.get("/hello_world", (req, res) => {
-            res.send("Hello deploy");
+
+
+        app.post('/add-bot/:roomId', async (req, res) => {
+            try {
+                const roomId = req.params.roomId;
+                
+                    const bot = new BotClient();
+                    await bot.joinRoom(roomId);
+                    res.send({ success: true, message: 'Bot added successfully.' });
+            
+            } catch (error) {
+
+                console.log(error as Error);
+
+                if (error instanceof Error) {
+
+                res.status(500).send({ success: false, message: error.message });
+                }
+            }
         });
 
       

@@ -12,6 +12,7 @@ import type { ChessRoomState } from "../../server/src/rooms/schema/ChessRoomStat
 import type PlayerMove from "../../server/src/rooms/schema/PlayerMove";
 
 import { ArraySchema } from "@colyseus/schema";
+import InviteBotButton from "./InviteBotButton";
 
 function ChessGame() {
   const [client] = useState(
@@ -197,7 +198,8 @@ function ChessGame() {
       <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg">
         <div>Room ID: {room?.id}</div>
         {isPlayerAlone() ? (
-          <p>Waiting for an opponent...</p>
+<><p>Waiting for an opponent...</p> <InviteBotButton roomId={room.id} /></>
+
         ) : (
           mainGameAreaBlock()
         )}
