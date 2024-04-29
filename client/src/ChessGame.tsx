@@ -235,7 +235,7 @@ function ChessGame() {
   );
 
   const roomBlock = () => (
-    <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 px-40">
+    <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 lg:px-40 px-3">
       <div className="">
         <div className="">Room ID: {room?.id}</div>
         {isPlayerAlone() ? (
