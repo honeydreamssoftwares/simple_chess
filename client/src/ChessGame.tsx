@@ -223,18 +223,20 @@ function ChessGame() {
 
       </p>
       {!gameOver && (
+        <div className="">
         <Chessboard
           boardOrientation={isWhite ? "white" : "black"}
           position={game.fen()}
           onPieceDrop={onPieceDropCallback}
         />
+        </div>
       )}
     </>
   );
 
   const roomBlock = () => (
-    <div className="columns-lg space-x-8">
-      <div className="columns-xs	 bg-white p-6 rounded-lg shadow-lg">
+    <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 px-40">
+      <div className="">
         <div className="">Room ID: {room?.id}</div>
         {isPlayerAlone() ? (
           <>
