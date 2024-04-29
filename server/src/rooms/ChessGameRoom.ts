@@ -9,6 +9,8 @@ export class ChessGameRoom extends Room<ChessRoomState> {
   maxClients = 2;
   private moveTimeout: NodeJS.Timeout | null = null;
   private timeOutMillisec = 100000;
+  private waitTimeout: NodeJS.Timeout | null = null;
+
 
   areBothPlayersAvailable(): boolean {
     return this.clients.length === 2;
@@ -28,6 +30,13 @@ export class ChessGameRoom extends Room<ChessRoomState> {
   //Events
 
   onCreate(options: any) {
+
+
+    this.waitTimeout = setTimeout(() => {
+      console.log('No second player joined. Destroying room.');
+      this.disconnect(); // This method ends the room and cleans up.
+  }, 30000); 
+
     this.setState(new ChessRoomState());
     this.chessGame = new Chess();
 
@@ -118,11 +127,14 @@ export class ChessGameRoom extends Room<ChessRoomState> {
 
     if (this.state.game_result_status) {
       this.state.is_game_running = false;
-      //this.disconnect();
     }
   }
   onJoin(client: Client, options: { playerName: string }) {
     console.log(client.sessionId, "joined with name:", options.playerName);
+
+    if(this.currentNumberOfPlayers()===2){
+      clearTimeout(this.waitTimeout); 
+    }
 
     const playerDetails = new PlayerDetails();
     playerDetails.color =
@@ -131,6 +143,8 @@ export class ChessGameRoom extends Room<ChessRoomState> {
     //Save state
     this.state.players.set(client.sessionId, playerDetails);
     this.state.number_of_players = this.currentNumberOfPlayers();
+
+
   }
 
   onLeave(client: Client, consented: boolean) {
@@ -140,7 +154,14 @@ export class ChessGameRoom extends Room<ChessRoomState> {
         "Player Left"
       );
 
-
+      if(this.currentNumberOfPlayers()<2){
+        this.lock();
+        clearTimeout(this.waitTimeout);
+        this.waitTimeout = setTimeout(() => {
+          console.log('Room is still empty. Destroying room.');
+          this.disconnect();
+      }, 30000);
+      }
    // this.state.number_of_players = this.currentNumberOfPlayers();
   }
   onDispose() {
