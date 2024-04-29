@@ -129,10 +129,9 @@ function ChessGame() {
     setTurn("white");
     setPlayerColor("");
     setMoves(null);
-    setPlayerName("");
     setOpponentName("");
     setGameOver(false);
-    
+
     try {
       const joinedRoom = await client.joinOrCreate<ChessRoomState>(
         "chess_room",
