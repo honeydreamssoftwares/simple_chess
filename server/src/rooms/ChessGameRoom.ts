@@ -118,7 +118,6 @@ export class ChessGameRoom extends Room<ChessRoomState> {
 
     if (this.state.game_result_status) {
       this.state.is_game_running = false;
-      //this.disconnect();
     }
   }
   onJoin(client: Client, options: { playerName: string }) {

@@ -62,28 +62,22 @@ function ChessGame() {
       });
 
       room.state.listen("turn_of_player", (currentValue) => {
-        console.log(`current value is now ${currentValue}`);
-        console.log(room.state);
         setTurn(currentValue);
       });
 
       room.state.listen("number_of_players", (currentValue) => {
-        console.log(`current value is now ${currentValue}`);
         setPlayerCount(currentValue);
       });
 
       room.state.listen("fen", (currentValue) => {
-        console.log(`current value is now ${currentValue}`);
         setGame(new Chess(currentValue));
       });
 
-      room.state.moves.onAdd((currentValue) => {
-        console.log(`Moves current value is now ${currentValue}`);
+      room.state.moves.onAdd(() => {
         setMoves(new ArraySchema<PlayerMove>(...room.state.moves));
       });
 
       room.state.listen("number_of_players", (currentValue) => {
-        console.log(`current value is now ${currentValue}`);
 
         //Self details
         room.state.players.forEach((details, sessionId) => {
